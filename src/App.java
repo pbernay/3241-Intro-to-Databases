@@ -1,11 +1,13 @@
 import java.util.Scanner;
 
 public class App {
+    public static boolean shouldRun = true;
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        while (true) {
-            // Clear the screen 
+        while (shouldRun) {
+            // Clear the screen
             clearScreen();
 
             // Display the main menu.
@@ -17,9 +19,20 @@ public class App {
             System.out.print("Pick an Option (1,2): ");
 
             // Read user input.
-            int choice = scanner.nextInt();
+            String choice = scanner.nextLine();
+            checkForQuit(choice);
+            int choiceInt = 4;
+            if (shouldRun) {
+                try {
+                    choiceInt = Integer.parseInt(choice);
+                } catch (Exception e) {
+                    choiceInt = 4;
+                }
+            } else {
+                choiceInt = 3;
+            }
 
-            switch (choice) {
+            switch (choiceInt) {
                 case 1:
                     SearchModify(scanner);
                     break;
@@ -34,39 +47,65 @@ public class App {
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-
+            if (!shouldRun) {
+                System.out.println("Exiting...");
+                scanner.close();
+                System.exit(0);
+            }
             // Wait for user to press Enter to continue.
             System.out.print("Press Enter to continue...");
             scanner.nextLine(); // Consume the newline character.
-            scanner.nextLine(); // Wait for Enter.
         }
     }
 
     public static void SearchModify(Scanner scanner) {
-        clearScreen();
-        System.out.println("Search/Modify selected.");
-        System.out.println("Availible entities to search in include:");
-        System.out.println("'Employee', 'Local Warehouse', 'Drone', 'Order', 'Equipment', 'Community Member', 'Payment', 'Reviews'");
-        // ^^ add list of entities to make it better - possibly pull it from the database - same with the attributes
-        System.out.println("------------------------------------------------------------------------------------------------------");
-        
-        System.out.println("What entity do you want to select to search in?");
-        String entityParam = scanner.nextLine();
+        while (shouldRun) {
+            clearScreen();
+            System.out.println("Search/Modify selected.");
+            System.out.println("Availible entities to search in include:");
+            System.out.println(
+                    "'Employee', 'Local Warehouse', 'Drone', 'Order', 'Equipment', 'Community Member', 'Payment', 'Reviews'");
+            // ^^ add list of entities to make it better - possibly pull it from the
+            // database - same with the attributes
+            System.out.println(
+                    "------------------------------------------------------------------------------------------------------");
 
-        System.out.println("What attribute would you want to search for?");
-        String attribute = scanner.nextLine();
-        System.out.print("Enter " + attribute + ": ");
-        String attributeParam = scanner.nextLine();
-        
+            System.out.println("What entity do you want to select to search in?");
+            String entityParam = scanner.nextLine();
+            checkForQuit(entityParam);
+            if (!shouldRun)
+                break;
 
+            System.out.println("What attribute would you want to search for?");
+            String attribute = scanner.nextLine();
+            checkForQuit(attribute);
+            if (!shouldRun)
+                break;
+
+            System.out.print("Enter " + attribute + ": ");
+            String attributeParam = scanner.nextLine();
+            checkForQuit(attributeParam);
+            if (!shouldRun)
+                break;
+
+            System.out.println("Result would be here for " + entityParam + ", " + attribute + ", " + attributeParam);
+            System.out.println("Exiting...");
+            break;
+        }
     }
 
-    private static void clearScreen() { //only works for windows I believe
+    private static void clearScreen() { // only works for windows I believe
         try {
             // Execute the "cls" command to clear the Windows console.
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
         } catch (Exception e) {
             System.err.println("Error clearing console: " + e.getMessage());
+        }
+    }
+
+    public static void checkForQuit(String input) {
+        if ("q".equals(input)) {
+            shouldRun = false;
         }
     }
 }
