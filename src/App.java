@@ -147,6 +147,7 @@ public class App {
         System.out.format(format, attributesList.toArray());
         System.out.println(
                 "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("**Data from database here**");
     }
 
     public static String formatStrings(int sizeEntity) {
