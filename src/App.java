@@ -1,8 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class App {
@@ -47,7 +47,7 @@ public class App {
                     SearchModify(scanner);
                     break;
                 case 2: // Add something
-                    System.out.println("Add selected.");
+                    add(scanner);
                     break;
                 case 3: // Exit
                     // Close the scanner and terminate the program
@@ -69,6 +69,76 @@ public class App {
             // Prompt the user to press Enter to return to the menu
             System.out.print("Press Enter to continue...");
             scanner.nextLine(); // Consume the newline character to wait for Enter press
+        }
+    }
+
+    public static void add(Scanner scanner) {
+        // Loop to keep the Search/Modify functionality until user enters 'q'
+        while (shouldRun) {
+            clearScreen();
+
+            System.out.println("Add selected.");
+            System.out.println("Available entities to search in include:");
+            ArrayList listEntities = listParse("listOfEntities.txt");
+            System.out.println(listEntities);
+            // The availible entities/attributes that are shown will be pulled from the
+            // database hopefully
+            System.out.println(
+                    "------------------------------------------------------------------------------------------------------");
+
+            String entityParam;
+            while (true) {
+                System.out.println("What type of entity would you like to add to?");
+                entityParam = scanner.nextLine();
+                checkForQuit(entityParam);
+                if (!shouldRun)
+                    return;
+
+                if (listEntities.contains(entityParam)) {
+                    break;
+                } else {
+                    System.out.println("Invalid entity entered. Please try again.");
+                }
+            }
+
+            ArrayList<String> attributesList = new ArrayList<>();
+            StringBuilder entityToSearch = new StringBuilder();
+            entityToSearch.append("attributeLists/att" + entityParam + ".txt");
+            attributesList = listParse(entityToSearch.toString());
+
+            System.out.println(attributesList.toString());
+            System.out.println(
+                    "------------------------------------------------------------------------------------------------------");
+            System.out.println("Enter each attribute (in the order above) with commas between (" + attributesList.get(0)
+                    + ", " + attributesList.get(1) + ", ...):");
+
+            String recordString = scanner.nextLine();
+            checkForQuit(recordString);
+            if (!shouldRun)
+                return;
+
+            clearScreen();
+
+            ArrayList<String> record = new ArrayList<>(Arrays.asList(recordString.split(", ")));
+
+            System.out.println(attributesList.toString());
+            System.out.println(
+                    "------------------------------------------------------------------------------------------------------");
+            System.out.println(record);
+
+            System.out.println();
+            System.out.println("Is the above the correct information (y/n)?");
+
+            String confirm = scanner.nextLine();
+            checkForQuit(confirm);
+            if (!shouldRun)
+                return;
+
+            if (confirm.equals("y")) {
+                System.out.println();
+                System.out.println("Successfully added!");
+            }
+            break;
         }
     }
 
@@ -125,7 +195,7 @@ public class App {
             if (!shouldRun)
                 break; // Exit the loop if user entered 'q'
 
-            displayResultsUI(entityParam, attribute, attributeParam);
+            displayResultsUI(entityParam);
             // Placeholder for where you would display search results
             // These results will come later when we link the database
             // System.out.println("Result would be here for " + entityParam + ", " +
@@ -136,7 +206,7 @@ public class App {
         }
     }
 
-    public static void displayResultsUI(String entityParam, String attribute, String attributeParam) {
+    public static void displayResultsUI(String entityParam) {
         ArrayList<String> attributesList = new ArrayList<>();
         StringBuilder entityToSearch = new StringBuilder();
         entityToSearch.append("attributeLists/att" + entityParam + ".txt");
