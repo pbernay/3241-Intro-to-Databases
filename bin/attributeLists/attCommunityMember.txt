@@ -1,0 +1,8 @@
+"UserID"
+"FirstName"
+"LastName"
+"Address"
+"Phone#"
+"Email"
+"StartDate"
+"WarehouseDistance"

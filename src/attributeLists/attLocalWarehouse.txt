@@ -1,0 +1,6 @@
+"City"
+"Address"
+"Phone#"
+"ManagerName"
+"Storage Cap"
+"Drone Cap"

@@ -1,0 +1,7 @@
+"EmployeeID"
+"WarehouseNo"
+"FirstName"
+"LastName"
+"Phone#"
+"Email"
+"HoursWorked"
