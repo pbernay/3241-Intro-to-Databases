@@ -1,3 +1,8 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class App {
@@ -75,19 +80,36 @@ public class App {
             // Display options related to Search/Modify
             System.out.println("Search/Modify selected.");
             System.out.println("Available entities to search in include:");
-            System.out.println(
-                    "'Employee', 'Local Warehouse', 'Drone', 'Order', 'Equipment', 'Community Member', 'Payment', 'Reviews'");
+            ArrayList listEntities = listParse("listOfEntities.txt");
+            System.out.println(listEntities);
             // The availible entities/attributes that are shown will be pulled from the
             // database hopefully
             System.out.println(
                     "------------------------------------------------------------------------------------------------------");
 
-            // Prompt the user to specify which entity they want to search within ex. Member
-            System.out.println("What entity do you want to select to search in?");
-            String entityParam = scanner.nextLine();
-            checkForQuit(entityParam);
-            if (!shouldRun)
-                break; // Exit the loop if user entered 'q'
+            String entityParam;
+            while (true) {
+                // Prompt the user to specify which entity they want to search within ex. Member
+                System.out.println("What entity do you want to select to search in?");
+                entityParam = scanner.nextLine();
+                checkForQuit(entityParam);
+                if (!shouldRun)
+                    return;
+
+                if (listEntities.contains(entityParam)) {
+                    break;
+                } else {
+                    System.out.println("Invalid entity entered. Please try again.");
+                }
+            }
+            StringBuilder entityToSearch = new StringBuilder();
+            entityToSearch.append("attributeLists/att" + entityParam + ".txt");
+
+            System.out.println();
+            System.out.println("Available attributes to search in include:");
+            System.out.println(listParse(entityToSearch.toString()));
+            System.out.println(
+                    "------------------------------------------------------------------------------------------------------");
 
             // Prompt the user for the attribute they want to search by ex. Last Name
             System.out.println("What attribute would you want to search for?");
@@ -103,13 +125,38 @@ public class App {
             if (!shouldRun)
                 break; // Exit the loop if user entered 'q'
 
+            displayResultsUI(entityParam, attribute, attributeParam);
             // Placeholder for where you would display search results
             // These results will come later when we link the database
-            System.out.println("Result would be here for " + entityParam + ", " + attribute + ", " + attributeParam);
-            System.out.println("Exiting...");
+            // System.out.println("Result would be here for " + entityParam + ", " +
+            // attribute + ", " + attributeParam);
+            // System.out.println("Exiting...");
 
             break; // Exit the loop after one search iteration
         }
+    }
+
+    public static void displayResultsUI(String entityParam, String attribute, String attributeParam) {
+        ArrayList<String> attributesList = new ArrayList<>();
+        StringBuilder entityToSearch = new StringBuilder();
+        entityToSearch.append("attributeLists/att" + entityParam + ".txt");
+
+        attributesList = listParse(entityToSearch.toString());
+
+        String format = formatStrings(attributesList.size());
+        System.out.format(format, attributesList.toArray());
+        System.out.println(
+                "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+    }
+
+    public static String formatStrings(int sizeEntity) {
+        StringBuilder format = new StringBuilder();
+
+        for (int i = 0; i < sizeEntity; i++) {
+            format.append("%-20s");
+        }
+        format.append("%n");
+        return format.toString();
     }
 
     private static void clearScreen() {
@@ -128,5 +175,22 @@ public class App {
         if ("q".equals(input)) {
             shouldRun = false;
         }
+    }
+
+    public static ArrayList<String> listParse(String listName) { // parses lists of entities/attributes into an
+                                                                 // arraylist
+        String fileName = listName;
+        ArrayList<String> categories = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // Remove quotes and trim spaces
+                categories.add(line.replace("\"", "").trim());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return categories;
     }
 }
