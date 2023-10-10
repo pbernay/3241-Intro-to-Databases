@@ -8,7 +8,6 @@ This application provides a user interface for managing and interacting with ent
    - Searching or modifying entities.
    - Adding new entities.
    - Exiting the application.
-   
 2. **Dynamic Loading of Entities and Attributes**: The application loads available entities and their attributes dynamically from external text files.
 
 3. **User-Friendly Search and Modification Interface**: Users can select an entity, specify an attribute, and provide a value to search for. The results would be fetched from the database and displayed in a formatted manner.
@@ -35,7 +34,7 @@ This application provides a user interface for managing and interacting with ent
 
 1. Ensure that the required text files (`listOfEntities.txt` and any `att<EntityName>.txt` files) are present in the project directory or the specified path.
 2. Compile the `App` class.
-3. Run the `App` class's `main` method ('java App.java').
+3. Run the `App` class's `main` method (`java App.java`).
 4. Interact with the application using the console.
 
 ## Notes
