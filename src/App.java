@@ -195,7 +195,18 @@ public class App {
             if (!shouldRun)
                 break; // Exit the loop if user entered 'q'
 
-            displayResultsUI(entityParam);
+            clearScreen();
+            System.out.println("***Showing results for: " + entityParam + "***");
+            displayResultsUI(entityParam, attribute, attributeParam);
+            System.out.println();
+
+            ArrayList<String> attributesList = new ArrayList<>();
+            attributesList = listParse(entityToSearch.toString());
+
+            System.out.println("What " + entityParam + " (by " + attributesList.get(0)
+                    + ") do you want to modify/delete(m/d) or type n to return to main menu (Ex. "
+                    + attributesList.get(0) + ", m):");
+
             // Placeholder for where you would display search results
             // These results will come later when we link the database
             // System.out.println("Result would be here for " + entityParam + ", " +
@@ -206,7 +217,7 @@ public class App {
         }
     }
 
-    public static void displayResultsUI(String entityParam) {
+    public static void displayResultsUI(String entityParam, String attribute, String attributeParam) {
         ArrayList<String> attributesList = new ArrayList<>();
         StringBuilder entityToSearch = new StringBuilder();
         entityToSearch.append("attributeLists/att" + entityParam + ".txt");
