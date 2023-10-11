@@ -1,0 +1,21 @@
+EquipmentSerial#,Description,Type,Model#,Year,ArrivalDate,WarrantyExp,Manufacturer,Weight,Width,Length,Height,Status
+E00000,Screwdriver,Hand Tool,M100,2016,9/21/2022,11/9/2025,EquipKing,26.54 kg,1.62 m,1.69 m,0.14 m,Available
+E00001,Drill,Hand Tool,Z300,2014,6/8/2022,10/24/2026,TechTools,10.16 kg,0.30 m,1.98 m,0.67 m,Maintenance
+E00002,Saw,Plumbing,Q500,2001,7/17/2020,11/12/2023,BuildMaster,31.39 kg,1.52 m,1.27 m,1.80 m,Maintenance
+E00003,Screwdriver,Electrical,Z300,2001,9/17/2021,7/8/2024,BuildMaster,42.17 kg,1.57 m,0.41 m,1.60 m,Maintenance
+E00004,Drill,Plumbing,Z300,2008,11/7/2018,12/26/2022,CraftsMania,29.51 kg,1.10 m,1.91 m,0.97 m,Maintenance
+E00005,Screwdriver,Plumbing,Q500,2000,1/21/2019,4/21/2023,CraftsMania,22.04 kg,1.18 m,0.97 m,1.55 m,Available
+E00006,Hammer,Electrical,Z300,2022,10/24/2020,1/31/2025,CraftsMania,46.97 kg,1.88 m,1.07 m,1.79 m,Maintenance
+E00007,Drill,Plumbing,X200,2009,1/2/2022,4/8/2026,CraftsMania,41.42 kg,1.20 m,0.47 m,1.67 m,Rented
+E00008,Saw,Plumbing,Z300,2014,2/21/2020,4/14/2024,BuildMaster,31.91 kg,1.64 m,0.65 m,0.39 m,Rented
+E00009,Hammer,Power Tool,X200,2006,10/22/2018,3/3/2023,CraftsMania,7.80 kg,0.97 m,1.21 m,1.16 m,Rented
+E00010,Saw,Plumbing,X200,2022,10/14/2022,8/4/2024,BuildMaster,27.58 kg,1.54 m,0.36 m,1.27 m,Rented
+E00011,Wrench,Electrical,M100,2019,9/7/2021,5/5/2026,CraftsMania,5.35 kg,0.11 m,0.83 m,0.58 m,Reserved
+E00012,Wrench,Hand Tool,Q500,2022,1/1/2019,4/11/2020,CraftsMania,5.40 kg,0.19 m,0.19 m,1.05 m,Rented
+E00013,Hammer,Electrical,Q500,2011,4/29/2021,8/10/2024,ToolCorp,39.87 kg,1.06 m,1.65 m,1.77 m,Maintenance
+E00014,Drill,Gardening,Z300,2007,4/14/2022,2/8/2024,TechTools,38.79 kg,1.20 m,1.53 m,1.39 m,Maintenance
+E00015,Wrench,Hand Tool,X200,2011,5/27/2020,11/8/2024,EquipKing,7.03 kg,0.58 m,0.31 m,0.35 m,Available
+E00016,Saw,Gardening,W400,1999,12/14/2020,11/16/2025,BuildMaster,28.75 kg,1.11 m,1.30 m,1.76 m,Available
+E00017,Drill,Gardening,Q500,1997,6/11/2020,4/19/2025,TechTools,37.02 kg,0.58 m,1.69 m,1.42 m,Reserved
+E00018,Screwdriver,Power Tool,Z300,2010,3/13/2021,7/27/2022,EquipKing,36.29 kg,0.89 m,1.24 m,1.48 m,Rented
+E00019,Drill,Hand Tool,M100,1997,10/6/2020,11/25/2021,TechTools,18.69 kg,1.40 m,0.54 m,1.74 m,Available
