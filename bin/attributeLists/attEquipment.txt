@@ -1,4 +1,4 @@
-"Serial#"
+"EquipmentSerial#"
 "Description"
 "Type"
 "Model#"
@@ -11,4 +11,3 @@
 "Length"
 "Height"
 "Status"
-"AvgRating"

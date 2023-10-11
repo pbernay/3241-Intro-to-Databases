@@ -1,5 +1,4 @@
-"EmployeeID"
-"WarehouseNo"
+"ManagerID"
 "FirstName"
 "LastName"
 "Phone#"

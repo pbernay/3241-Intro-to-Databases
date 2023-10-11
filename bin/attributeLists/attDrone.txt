@@ -1,4 +1,4 @@
-"Serial#"
+"DroneSerial#"
 "Name"
 "Model#"
 "Manufacturer"
@@ -7,5 +7,4 @@
 "VolumeCapactiy"
 "DistanceAutonomy"
 "MaxSpeed"
-"WarrantyExp"
 "Status"

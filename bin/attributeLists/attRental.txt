@@ -1,0 +1,8 @@
+"RentalID"
+"UserID"
+"EquipmentSerial#"
+"DroneSerial#"
+"RentalDate"
+"DueDate"
+"ReturnDate"
+"RentalFee"

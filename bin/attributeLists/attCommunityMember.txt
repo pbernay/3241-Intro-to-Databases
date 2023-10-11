@@ -6,3 +6,5 @@
 "Email"
 "StartDate"
 "WarehouseDistance"
+"Status"
+"WarehouseID"
