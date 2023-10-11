@@ -106,11 +106,13 @@ public class App {
             entityToSearch.append("attributeLists/att" + entityParam + ".txt");
             attributesList = listParse(entityToSearch.toString());
 
+            clearScreen();
             System.out.println(attributesList.toString());
             System.out.println(
                     "------------------------------------------------------------------------------------------------------");
-            System.out.println("Enter each attribute (in the order above) with commas between (" + attributesList.get(0)
-                    + ", " + attributesList.get(1) + ", ...):");
+            System.out.println(
+                    "Enter each attribute (in the order above) with commas between (Ex. " + attributesList.get(0)
+                            + ", " + attributesList.get(1) + ", ...):");
 
             String recordString = scanner.nextLine();
             checkForQuit(recordString);
@@ -129,15 +131,30 @@ public class App {
             System.out.println();
             System.out.println("Is the above the correct information (y/n)?");
 
-            String confirm = scanner.nextLine();
+            String confirm = scanner.nextLine().toLowerCase().trim();
             checkForQuit(confirm);
             if (!shouldRun)
                 return;
 
+            while (!confirm.equals("y") && !confirm.equals("n")) {
+                System.out.println("Invalid input. Please enter 'y' for yes or 'n' for no.");
+                confirm = scanner.nextLine().toLowerCase().trim();
+            }
             if (confirm.equals("y")) {
                 System.out.println();
-                System.out.println("Successfully added!");
+                System.out.println("Successfully added!"); 
+                //does not currently add anything because the database is not set up
+            } else {
+                System.out.println();
+                System.out.println("No selected taking you back to the add screen");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                add(scanner);
             }
+
             break;
         }
     }
@@ -207,11 +224,7 @@ public class App {
                     + ") do you want to modify/delete(m/d) or type n to return to main menu (Ex. "
                     + attributesList.get(0) + ", m):");
 
-            // Placeholder for where you would display search results
-            // These results will come later when we link the database
-            // System.out.println("Result would be here for " + entityParam + ", " +
-            // attribute + ", " + attributeParam);
-            // System.out.println("Exiting...");
+            System.out.println("Currently waiting for data from the database to continue the program...");
 
             break; // Exit the loop after one search iteration
         }
