@@ -1,5 +1,6 @@
 "PaymentID"
 "Amount"
-"CustomerID"
+"RentalID"
 "PaymentMethod"
 "Status"
+"UserID"
