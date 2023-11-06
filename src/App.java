@@ -4,23 +4,36 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
 
 public class App {
-    // A flag to determine if the application should continue running
-    public static boolean shouldRun = true;
-
+    // Static variables that the class uses
+    public static boolean shouldRun = true; // A flag to determine if the application should continue running
     public static ArrayList<String> CommunityMemberExample = new ArrayList<>();
     public static ArrayList<String> EquipmentExample = new ArrayList<>();
     public static ArrayList<String> LocalWarehouseExample = new ArrayList<>();
 
+    // JDBC URL and username/pass of SQLite
+    private static final String url = "jdbc:sqlite:3241Project.db";
+    private static final String username = "username";
+    private static final String password = "password";
+
+    // JDBC variables for opening and managing connections
+    private static Connection con;
+    private static Statement stmt;
+    private static ResultSet rs;
+
+    // main entry for the java app
     public static void main(String[] args) {
         // Create a Scanner object for reading user input
         Scanner scanner = new Scanner(System.in);
 
-        // Keep displaying the menu and accepting user input until shouldRun is false
-        while (shouldRun) {
-            // Clears the terminal or console screen
-            clearScreen();
+        while (shouldRun) { // Keep displaying the menu and accepting user input until shouldRun is false
+            clearScreen(); // Clears the terminal or console screen
 
             // Display the options available in the main menu
             System.out.println("MAIN MENU");
@@ -76,39 +89,42 @@ public class App {
         }
     }
 
+    // method for the add menu
     public static void add(Scanner scanner) {
         // Loop to keep the Search/Modify functionality until user enters 'q'
         while (shouldRun) {
             clearScreen();
 
+            // displays the Add menu options
             System.out.println("Add selected.");
             System.out.println("Available entities to search in include:");
-            ArrayList listEntities = attListParse("listOfEntities.txt");
-            System.out.println(listEntities);
-            // The availible entities/attributes that are shown will be pulled from the
-            // database hopefully
+
+            ArrayList<String> listEntities = entListFromDB();
+            System.out.println(listEntities); // entities pulled from Database
+
             System.out.println(
                     "------------------------------------------------------------------------------------------------------");
 
+            // where the user selects what entity to add
             String entityParam;
             while (true) {
-                System.out.println("What type of entity would you like to add to?");
-                entityParam = scanner.nextLine();
-                checkForQuit(entityParam);
-                if (!shouldRun)
-                    return;
+                System.out.println("What type of entity would you like to add to?(Case Sensitive)");
+                entityParam = scanner.nextLine(); // user input
 
+                checkForQuit(entityParam); // debug quit
+                if (!shouldRun)
+                    return; // exit if the user entered debug quit
+
+                // validates the input against entities
                 if (listEntities.contains(entityParam)) {
-                    break;
+                    break; // if valid
                 } else {
                     System.out.println("Invalid entity entered. Please try again.");
                 }
             }
 
-            ArrayList<String> attributesList = new ArrayList<>();
-            StringBuilder entityToSearch = new StringBuilder();
-            entityToSearch.append("attributeLists/att" + entityParam + ".txt");
-            attributesList = attListParse(entityToSearch.toString());
+            // attributes pulled from database
+            ArrayList<String> attributesList = attListFromDB(entityParam);
 
             clearScreen();
             System.out.println(attributesList.toString());
@@ -150,7 +166,7 @@ public class App {
                 // does not currently add anything because the database is not set up
             } else {
                 System.out.println();
-                System.out.println("No selected taking you back to the add screen");
+                System.out.println("'No' selected taking you back to the add screen");
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
@@ -163,6 +179,7 @@ public class App {
         }
     }
 
+    // method for the functionality of both searching and modifying
     public static void SearchModify(Scanner scanner) {
         // Loop to keep the Search/Modify functionality until user enters 'q'
         while (shouldRun) {
@@ -171,17 +188,17 @@ public class App {
             // Display options related to Search/Modify
             System.out.println("Search/Modify selected.");
             System.out.println("Available entities to search in include:");
-            ArrayList listEntities = attListParse("listOfEntities.txt");
-            System.out.println(listEntities);
-            // The availible entities/attributes that are shown will be pulled from the
-            // database hopefully
+
+            ArrayList<String> listEntities = entListFromDB();
+            System.out.println(listEntities); // entities pulled from Database
+
             System.out.println(
                     "------------------------------------------------------------------------------------------------------");
 
             String entityParam;
             while (true) {
                 // Prompt the user to specify which entity they want to search within ex. Member
-                System.out.println("What entity do you want to select to search in?");
+                System.out.println("What entity do you want to select to search in?(Case Sensitive)");
                 entityParam = scanner.nextLine();
                 checkForQuit(entityParam);
                 if (!shouldRun)
@@ -193,25 +210,37 @@ public class App {
                     System.out.println("Invalid entity entered. Please try again.");
                 }
             }
-            StringBuilder entityToSearch = new StringBuilder();
-            entityToSearch.append("attributeLists/att" + entityParam + ".txt");
+
+            // attributes pulled from database
+            ArrayList<String> attributesList = attListFromDB(entityParam);
 
             System.out.println();
             System.out.println("Available attributes to search in include:");
-            System.out.println(attListParse(entityToSearch.toString()));
+            System.out.println(attributesList);
             System.out.println(
                     "------------------------------------------------------------------------------------------------------");
 
+            String attribute;
+            String attributeParam = null;
             // Prompt the user for the attribute they want to search by ex. Last Name
-            System.out.println("What attribute would you want to search for?");
-            String attribute = scanner.nextLine();
-            checkForQuit(attribute);
+            while (true) {
+                System.out.println("What attribute would you want to search for?(Case Sensitive)");
+                attribute = scanner.nextLine();
+                checkForQuit(attribute);
+                if (!shouldRun)
+                    break; // Exit the loop if user entered 'q'
+                if (attributesList.contains(attribute)) {
+                    break;
+                } else {
+                    System.out.println("Invalid attribute entered. Please try again. Remember it is Case Sensitive.");
+                }
+            }
             if (!shouldRun)
                 break; // Exit the loop if user entered 'q'
 
             // Get the specific value of the attribute the user wants to search for ex. Bob
             System.out.print("Enter " + attribute + ": ");
-            String attributeParam = scanner.nextLine();
+            attributeParam = scanner.nextLine();
             checkForQuit(attributeParam);
             if (!shouldRun)
                 break; // Exit the loop if user entered 'q'
@@ -220,9 +249,6 @@ public class App {
             System.out.println("***Showing results for: " + entityParam + "***");
             displayResultsUI(entityParam, attribute, attributeParam);
             System.out.println();
-
-            ArrayList<String> attributesList = new ArrayList<>();
-            attributesList = attListParse(entityToSearch.toString());
 
             System.out.println("What " + entityParam + " (by " + attributesList.get(0)
                     + ") do you want to modify/delete(m/d) or type n to return to main menu (Ex. "
@@ -235,11 +261,8 @@ public class App {
     }
 
     public static void displayResultsUI(String entityParam, String attribute, String attributeParam) {
-        ArrayList<String> attributesList = new ArrayList<>();
-        StringBuilder entityToSearch = new StringBuilder();
-        entityToSearch.append("attributeLists/att" + entityParam + ".txt");
-
-        attributesList = attListParse(entityToSearch.toString());
+        // attributes pulled from database
+        ArrayList<String> attributesList = attListFromDB(entityParam);
 
         String format = formatStrings(attributesList.size());
         System.out.format(format, attributesList.toArray());
@@ -276,27 +299,77 @@ public class App {
         }
     }
 
-    public static ArrayList<String> attListParse(String listName) { // parses lists of entities/attributes into an
-                                                                    // arraylist
-        ArrayList<String> categories = new ArrayList<>();
+    public static ArrayList<String> entListFromDB() {
+        ArrayList<String> tempList = new ArrayList<>();
+        // Query to select all table names in the main database
+        String query = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'";
 
-        try (BufferedReader br = new BufferedReader(new FileReader(listName))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                // Remove quotes and trim spaces
-                categories.add(line.replace("\"", "").trim());
+        try {
+            // opens database connection
+            con = DriverManager.getConnection(url, username, password);
+            stmt = con.createStatement();
+
+            // executes the query to get result
+            rs = stmt.executeQuery(query);
+
+            while (rs.next()) {
+                tempList.add(rs.getString("name"));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (SQLException sqlE) {
+            sqlE.printStackTrace();
+        } finally {
+            // Close the connections
+            try {
+                if (rs != null)
+                    rs.close();
+                if (stmt != null)
+                    stmt.close();
+                if (con != null)
+                    con.close();
+            } catch (SQLException se) {
+                // Handle the exception properly
+                se.printStackTrace();
+            }
         }
-        return categories;
+
+        return tempList;
     }
 
-    public static ArrayList<String> exListParse(String exName) {
-        ArrayList<String> example = new ArrayList<>();
+    public static ArrayList<String> attListFromDB(String tableName) {
+        ArrayList<String> tempList = new ArrayList<>();
+        String query = "PRAGMA table_info(" + tableName + ")";
 
-        
+        try {
+            // opens database connection
+            con = DriverManager.getConnection(url, username, password);
+            stmt = con.createStatement();
 
-        return example;
+            // executes the query and gets the result
+            rs = stmt.executeQuery(query);
+
+            // processing the result
+            while (rs.next()) {
+                tempList.add(rs.getString("name"));
+            }
+
+        } catch (SQLException sqlE) {
+            sqlE.printStackTrace();
+        } finally {
+            // closes the connections
+            try {
+                con.close();
+            } catch (SQLException se) {
+                /* can't do anything */ }
+            try {
+                stmt.close();
+            } catch (SQLException se) {
+                /* can't do anything */ }
+            try {
+                rs.close();
+            } catch (SQLException se) {
+                /* can't do anything */ }
+        }
+        return tempList;
     }
+
 }
