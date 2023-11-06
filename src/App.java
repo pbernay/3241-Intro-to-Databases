@@ -9,6 +9,10 @@ public class App {
     // A flag to determine if the application should continue running
     public static boolean shouldRun = true;
 
+    public static ArrayList<String> CommunityMemberExample = new ArrayList<>();
+    public static ArrayList<String> EquipmentExample = new ArrayList<>();
+    public static ArrayList<String> LocalWarehouseExample = new ArrayList<>();
+
     public static void main(String[] args) {
         // Create a Scanner object for reading user input
         Scanner scanner = new Scanner(System.in);
@@ -79,7 +83,7 @@ public class App {
 
             System.out.println("Add selected.");
             System.out.println("Available entities to search in include:");
-            ArrayList listEntities = listParse("listOfEntities.txt");
+            ArrayList listEntities = attListParse("listOfEntities.txt");
             System.out.println(listEntities);
             // The availible entities/attributes that are shown will be pulled from the
             // database hopefully
@@ -104,7 +108,7 @@ public class App {
             ArrayList<String> attributesList = new ArrayList<>();
             StringBuilder entityToSearch = new StringBuilder();
             entityToSearch.append("attributeLists/att" + entityParam + ".txt");
-            attributesList = listParse(entityToSearch.toString());
+            attributesList = attListParse(entityToSearch.toString());
 
             clearScreen();
             System.out.println(attributesList.toString());
@@ -142,8 +146,8 @@ public class App {
             }
             if (confirm.equals("y")) {
                 System.out.println();
-                System.out.println("Successfully added!"); 
-                //does not currently add anything because the database is not set up
+                System.out.println("Successfully added!");
+                // does not currently add anything because the database is not set up
             } else {
                 System.out.println();
                 System.out.println("No selected taking you back to the add screen");
@@ -167,7 +171,7 @@ public class App {
             // Display options related to Search/Modify
             System.out.println("Search/Modify selected.");
             System.out.println("Available entities to search in include:");
-            ArrayList listEntities = listParse("listOfEntities.txt");
+            ArrayList listEntities = attListParse("listOfEntities.txt");
             System.out.println(listEntities);
             // The availible entities/attributes that are shown will be pulled from the
             // database hopefully
@@ -194,7 +198,7 @@ public class App {
 
             System.out.println();
             System.out.println("Available attributes to search in include:");
-            System.out.println(listParse(entityToSearch.toString()));
+            System.out.println(attListParse(entityToSearch.toString()));
             System.out.println(
                     "------------------------------------------------------------------------------------------------------");
 
@@ -218,7 +222,7 @@ public class App {
             System.out.println();
 
             ArrayList<String> attributesList = new ArrayList<>();
-            attributesList = listParse(entityToSearch.toString());
+            attributesList = attListParse(entityToSearch.toString());
 
             System.out.println("What " + entityParam + " (by " + attributesList.get(0)
                     + ") do you want to modify/delete(m/d) or type n to return to main menu (Ex. "
@@ -235,7 +239,7 @@ public class App {
         StringBuilder entityToSearch = new StringBuilder();
         entityToSearch.append("attributeLists/att" + entityParam + ".txt");
 
-        attributesList = listParse(entityToSearch.toString());
+        attributesList = attListParse(entityToSearch.toString());
 
         String format = formatStrings(attributesList.size());
         System.out.format(format, attributesList.toArray());
@@ -272,12 +276,11 @@ public class App {
         }
     }
 
-    public static ArrayList<String> listParse(String listName) { // parses lists of entities/attributes into an
-                                                                 // arraylist
-        String fileName = listName;
+    public static ArrayList<String> attListParse(String listName) { // parses lists of entities/attributes into an
+                                                                    // arraylist
         ArrayList<String> categories = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(listName))) {
             String line;
             while ((line = br.readLine()) != null) {
                 // Remove quotes and trim spaces
@@ -287,5 +290,13 @@ public class App {
             e.printStackTrace();
         }
         return categories;
+    }
+
+    public static ArrayList<String> exListParse(String exName) {
+        ArrayList<String> example = new ArrayList<>();
+
+        
+
+        return example;
     }
 }
