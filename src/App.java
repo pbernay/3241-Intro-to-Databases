@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.sql.SQLException;
 
@@ -185,7 +186,7 @@ public class App {
             break;
         }
     }
-    
+
     public static void insertRecord(ArrayList<String> columns, ArrayList<String> values, String table) {
         // opens database connection
         try {
@@ -287,12 +288,13 @@ public class App {
             String attributeParam = null;
             // Prompt the user for the attribute they want to search by ex. Last Name
             while (true) {
-                System.out.println("What attribute would you want to search for?(Case Sensitive)");
+                System.out.println(
+                        "What attribute would you want to search for?(If you want all just type '*')(Case Sensitive)");
                 attribute = scanner.nextLine();
                 checkForQuit(attribute);
                 if (!shouldRun)
                     break; // Exit the loop if user entered 'q'
-                if (attributesList.contains(attribute)) {
+                if (attributesList.contains(attribute) || attribute.equals("*")) {
                     break;
                 } else {
                     System.out.println("Invalid attribute entered. Please try again. Remember it is Case Sensitive.");
@@ -300,48 +302,118 @@ public class App {
             }
             if (!shouldRun)
                 break; // Exit the loop if user entered 'q'
+            String[] attributeParamArray = null;
+            if (attribute.charAt(0) != '*' && attribute.length() != 1) {
+                // Get the specific value of the attribute the user wants to search for ex. Bob
+                System.out.println("Enter " + attribute + " and operator (EX. " + attribute + ", >): ");
+                attributeParam = scanner.nextLine();
+                attributeParamArray = attributeParam.split(", ");
+                checkForQuit(attributeParam);
+                if (isString(attributeParamArray[0]) == true) {
+                    StringBuilder tBld = new StringBuilder("'");
+                    tBld.append(attributeParamArray[0] + "'");
+                    attributeParamArray[0] = tBld.toString();
+                }
+                if (!shouldRun)
+                    break; // Exit the loop if user entered 'q'
+            }
 
-            // Get the specific value of the attribute the user wants to search for ex. Bob
-            System.out.print("Enter " + attribute + ": ");
-            attributeParam = scanner.nextLine();
-            checkForQuit(attributeParam);
-            if (!shouldRun)
-                break; // Exit the loop if user entered 'q'
+            System.out.println(
+                    "Enter the column name(s) you want to select (If you want all just type '*')(comma separated):");
+            String columns = scanner.nextLine();
 
             clearScreen();
             System.out.println("***Showing results for: " + entityParam + "***");
-            displayResultsUI(entityParam, attribute, attributeParam);
+            displayResultsUI(entityParam, attribute, attributeParamArray, columns);
             System.out.println();
 
             System.out.println("What " + entityParam + " (by " + attributesList.get(0)
                     + ") do you want to modify/delete(m/d) or type n to return to main menu (Ex. "
                     + attributesList.get(0) + ", m):");
 
-            System.out.println("Currently waiting for data from the database to continue the program...");
-
             break; // Exit the loop after one search iteration
         }
     }
 
-    public static void displayResultsUI(String entityParam, String attribute, String attributeParam) {
-        // attributes pulled from database
-        ArrayList<String> attributesList = attListFromDB(entityParam);
+    public static void displayResultsUI(String entityParam, String attribute, String[] attributeParam, String columns) {
+        String[] columnsArray = columns.split(", ");
+        ArrayList<String> columnsList = new ArrayList<>(Arrays.asList(columnsArray));
 
-        String format = formatStrings(attributesList.size());
-        System.out.format(format, attributesList.toArray());
-        System.out.println(
-                "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.println("**Data from database here**");
+        if (columnsList.get(0).equals("*")) {
+            columnsList = attListFromDB(entityParam);
+        }
+        String format = formatStrings(columnsList.size());
+        System.out.format(format, columnsList.toArray());
+        for (int i = 0; i < columnsList.size() * 30; i++) {
+            System.out.print("-");
+        }
+        System.out.println();
+        String sql;
+        ArrayList<String> parameters = new ArrayList<>();
+        if (attributeParam != null) {
+            String operator = attributeParam[1];
+            if (!operator.equals(">") && !operator.equals("<") && !operator.equals("=")) {
+                throw new IllegalArgumentException("Operator has not been coded yet.");
+            }
+            parameters.add(attributeParam[0]);
+            sql = "SELECT " + columns + " FROM " + entityParam + " WHERE " + attribute + " " + operator + " ?";
+            System.out.println(sql);
+        } else {
+            sql = "SELECT " + columns + " FROM " + entityParam;
+        }
+        sqlQuery(sql, parameters);
+    }
+
+    public static void sqlQuery(String sql, ArrayList<String> params) {
+        try {
+            // opens database connection
+            con = DriverManager.getConnection(url, username, password);
+
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            System.out.println(params.toString());
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setString(i + 1, params.get(i));
+            }
+            ResultSet rs = pstmt.executeQuery();
+
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int columnCount = rsmd.getColumnCount();
+
+            while (rs.next()) {
+                ArrayList<String> columnValues = new ArrayList<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnValue = rs.getString(i);
+                    columnValues.add(columnValue);
+                }
+                String format = formatStrings(columnValues.size());
+                System.out.format(format, columnValues.toArray());
+
+                System.out.print("\n");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public static String formatStrings(int sizeEntity) {
         StringBuilder format = new StringBuilder();
 
         for (int i = 0; i < sizeEntity; i++) {
-            format.append("%-20s");
+            format.append("%-30s");
         }
         format.append("%n");
         return format.toString();
+    }
+
+    public static boolean isString(String str) {
+        boolean isStr = true;
+        if (Character.isDigit(str.charAt(0)) && Character.isDigit(str.charAt(str.length() - 1))) {
+            isStr = false;
+        } else if (str.equals("true") || str.equals("false")) {
+            isStr = false;
+        }
+        return isStr;
     }
 
     private static void clearScreen() {
