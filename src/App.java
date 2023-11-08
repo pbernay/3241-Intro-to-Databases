@@ -1,11 +1,9 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
@@ -143,6 +141,16 @@ public class App {
 
             ArrayList<String> record = new ArrayList<>(Arrays.asList(recordString.split(", ")));
 
+            if (attributesList.size() != record.size()) {
+                System.out.println("The number of columns and values do not match. Try Again. Restarting...");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                add(scanner);
+            }
             System.out.println(attributesList.toString());
             System.out.println(
                     "------------------------------------------------------------------------------------------------------");
@@ -162,8 +170,7 @@ public class App {
             }
             if (confirm.equals("y")) {
                 System.out.println();
-                System.out.println("Successfully added!");
-                // does not currently add anything because the database is not set up
+                insertRecord(attributesList, record, entityParam);
             } else {
                 System.out.println();
                 System.out.println("'No' selected taking you back to the add screen");
@@ -176,6 +183,62 @@ public class App {
             }
 
             break;
+        }
+    }
+    
+    public static void insertRecord(ArrayList<String> columns, ArrayList<String> values, String table) {
+        // opens database connection
+        try {
+            con = DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        StringBuilder columnNames = new StringBuilder("(");
+        StringBuilder placeholders = new StringBuilder("(");
+        for (int i = 0; i < columns.size(); i++) {
+            columnNames.append(columns.get(i).trim());
+            placeholders.append("?");
+            if (i < columns.size() - 1) {
+                columnNames.append(", ");
+                placeholders.append(", ");
+            }
+        }
+        columnNames.append(")");
+        placeholders.append(")");
+
+        String sql = "INSERT INTO " + table + " " + columnNames.toString() + " VALUES " + placeholders.toString();
+
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            for (int i = 0; i < values.size(); i++) {
+                String value = values.get(i).trim();
+
+                if (Character.isDigit(value.charAt(0)) && Character.isDigit(value.charAt(value.length() - 1))) {
+                    try {
+                        if (value.contains(".")) {
+                            pstmt.setDouble(i + 1, Double.parseDouble(value));
+                        } else {
+                            pstmt.setInt(i + 1, Integer.parseInt(value));
+                        }
+                    } catch (NumberFormatException e) {
+                        pstmt.setString(i + 1, value);
+                    }
+                } else if (value.equals("true") || value.equals("false")) {
+                    pstmt.setBoolean(i + 1, Boolean.parseBoolean(value));
+                } else {
+                    pstmt.setString(i + 1, value);
+                }
+            }
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                System.out.println("Record inserted successfully.");
+            } else {
+                System.out.println("No record was inserted.");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error occurred(trying to insert): " + e.getMessage());
         }
     }
 
