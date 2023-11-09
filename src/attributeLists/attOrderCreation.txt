@@ -1,8 +1,0 @@
-"OrderNum"
-"UserID"
-"Description"
-"ElementType"
-"NumItems"
-"Value"
-"OrderDate"
-"ArrivalDate"

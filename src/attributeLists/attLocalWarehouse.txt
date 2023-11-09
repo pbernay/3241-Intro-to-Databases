@@ -1,5 +1,0 @@
-"WarehouseID"
-"City"
-"Phone#"
-"Storage Cap"
-"Drone Cap"
