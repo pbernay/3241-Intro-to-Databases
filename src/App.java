@@ -25,7 +25,16 @@ public class App {
     private static Statement stmt;
     private static ResultSet rs;
 
-    // main entry for the java app
+    /**
+     * Entry point for the application. This method initiates the main loop which
+     * displays a menu for the user to interact with. The menu allows the user to
+     * search/modify existing records, add new records, or exit the application.
+     * User choices are read from the standard input and actions are performed
+     * accordingly. The loop continues until the user decides to exit the
+     * application.
+     *
+     * @param args The command-line arguments, not used in this application.
+     */
     public static void main(String[] args) {
         // Create a Scanner object for reading user input
         Scanner scanner = new Scanner(System.in);
