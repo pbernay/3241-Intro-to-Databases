@@ -87,7 +87,35 @@ public class App {
         }
     }
 
-    // method for the add menu
+    /**
+     * Adds a new record to a specified entity in the database.
+     * This method guides the user through the process of adding a new record by:
+     * - Displaying a list of available entities to which a record can be added.
+     * - Allowing the user to select an entity.
+     * - Prompting for input for each attribute of the chosen entity.
+     * - Asking for confirmation before adding the record.
+     * 
+     * The process involves:
+     * - Displaying available entities retrieved from the database.
+     * - Validating user input against available entities.
+     * - Collecting attribute values for the new record.
+     * - Inserting the record into the database after confirmation.
+     *
+     * The method uses a Scanner object for user input and handles various user
+     * input scenarios,
+     * including validation checks and options to quit at different stages.
+     * 
+     * @param scanner The Scanner object used for obtaining user input from the
+     *                console.
+     *                It should be initialized before calling this method.
+     * 
+     *                Usage Example:
+     * 
+     *                <pre>
+     *                Scanner scanner = new Scanner(System.in);
+     *                add(scanner);
+     *                </pre>
+     */
     public static void add(Scanner scanner) {
         // Loop to keep the Search/Modify functionality until user enters 'q'
         while (shouldRun) {
@@ -186,6 +214,48 @@ public class App {
         }
     }
 
+    /**
+     * Inserts a new record into a specified table in the database.
+     * This method constructs a SQL insert statement dynamically based on the
+     * provided column names and values.
+     * It handles different data types (such as integers, doubles, booleans, and
+     * strings) when preparing the statement.
+     * The method also manages the database connection and execution of the prepared
+     * statement.
+     *
+     * The process involves:
+     * - Building a SQL insert statement using provided column names and
+     * placeholders for values.
+     * - Setting the values in the prepared statement with appropriate data types.
+     * - Executing the insert statement and reporting the outcome.
+     *
+     * This method assumes that the database connection details (url, username,
+     * password) are available to it.
+     * 
+     * @param columns An ArrayList of Strings representing the column names for the
+     *                insert statement.
+     * @param values  An ArrayList of Strings representing the values to be
+     *                inserted, corresponding to the columns.
+     *                Values should be in the same order as the columns. The method
+     *                attempts to parse
+     *                different data types based on the content of each value.
+     * @param table   The name of the table into which the record should be
+     *                inserted.
+     * 
+     *                Note:
+     *                - This method does not return the status of the insertion
+     *                operation but prints the outcome to the console.
+     *                - It is important that the order of columns matches the order
+     *                of values provided.
+     * 
+     *                Usage Example:
+     * 
+     *                <pre>
+     *                ArrayList<String> columns = new ArrayList<>(Arrays.asList("name", "age", "salary"));
+     *                ArrayList<String> values = new ArrayList<>(Arrays.asList("John Doe", "30", "45000.00"));
+     *                insertRecord(columns, values, "employees");
+     *                </pre>
+     */
     public static void insertRecord(ArrayList<String> columns, ArrayList<String> values, String table) {
         StringBuilder columnNames = new StringBuilder("(");
         StringBuilder placeholders = new StringBuilder("(");
@@ -236,7 +306,42 @@ public class App {
         }
     }
 
-    // method for the functionality of both searching and modifying
+    /**
+     * Handles the Search and Modify operations for entities in a database.
+     * The method allows users to select an entity and an attribute to search within
+     * that entity.
+     * It then displays search results and provides options to modify or delete the
+     * retrieved records.
+     *
+     * Steps involved in the method:
+     * 1. User selects an entity from the available options.
+     * 2. User specifies an attribute and its value for the search criteria.
+     * 3. The method retrieves and displays matching records.
+     * 4. The user is then given the option to modify or delete a record based on
+     * its primary key.
+     *
+     * The process includes:
+     * - Connecting to the database.
+     * - Dynamically generating SQL queries based on user input.
+     * - Handling SQL exceptions and ensuring proper closing of resources.
+     *
+     * @param scanner A Scanner object to capture user input.
+     *
+     *                Note:
+     *                - The method assumes that database connection details (url,
+     *                username, password) are accessible.
+     *                - This method utilizes other helper methods for specific tasks
+     *                (like 'modify', 'delete', etc.).
+     *                - The user interface is primarily text-based, using the
+     *                console for both input and output.
+     *
+     *                Usage Example:
+     * 
+     *                <pre>
+     *                Scanner scanner = new Scanner(System.in);
+     *                SearchModify(scanner);
+     *                </pre>
+     */
     public static void SearchModify(Scanner scanner) {
         // Loop to keep the Search/Modify functionality until user enters 'q'
         while (shouldRun) {
@@ -372,6 +477,47 @@ public class App {
         }
     }
 
+    /**
+     * Modifies a record in the database for a specified entity and primary key.
+     * The method allows the user to choose an attribute of the entity to modify and
+     * input a new value for it.
+     *
+     * Steps involved in the method:
+     * 1. Displays the current record based on the primary key provided.
+     * 2. Prompts the user to choose which attribute to modify.
+     * 3. Accepts a new value for the chosen attribute.
+     * 4. Updates the database with the new value.
+     * 5. Shows the updated record and asks the user to confirm (commit or rollback)
+     * the changes.
+     *
+     * The method ensures transactional integrity by using SQL transactions. In case
+     * of an error, it rolls back any changes made during the transaction.
+     * The user can continue modifying other attributes or exit the loop based on
+     * their input.
+     *
+     * @param con         The Connection object to connect to the database.
+     * @param pkChoice    The primary key value of the record to be modified.
+     * @param pkColumn    The primary key column of the entity.
+     * @param entityParam The name of the entity (table) in the database where the
+     *                    record is located.
+     * @param scanner     A Scanner object to capture user input.
+     *
+     *                    Note:
+     *                    - It is assumed that the method 'displayResultsUI' is used
+     *                    for displaying the records.
+     *                    - The user input is taken using the provided Scanner
+     *                    object.
+     *                    - The method handles SQL exceptions and ensures the
+     *                    database state is consistent in case of an error.
+     *
+     *                    Usage Example:
+     * 
+     *                    <pre>
+     *                    Connection con = DriverManager.getConnection(url, username, password);
+     *                    Scanner scanner = new Scanner(System.in);
+     *                    modify(con, "123", "id", "Employee", scanner);
+     *                    </pre>
+     */
     public static void modify(Connection con, String pkChoice, String pkColumn, String entityParam, Scanner scanner) {
         clearScreen();
         try {
@@ -457,6 +603,48 @@ public class App {
         }
     }
 
+    /**
+     * Deletes a record from the database based on the provided primary key.
+     * The method first displays the record that is to be deleted and then prompts
+     * the user for confirmation.
+     *
+     * Steps involved in the method:
+     * 1. Display the current record that matches the provided primary key.
+     * 2. Ask the user for confirmation to delete the record ('y' for yes, 'n' for
+     * no).
+     * 3. If confirmed, execute the DELETE statement to remove the record from the
+     * database.
+     * 4. If deletion is successful, a confirmation message is shown; otherwise, a
+     * message is displayed if no record was found.
+     * 5. In case of no confirmation ('n'), the user is redirected back to the
+     * Search/Modify screen.
+     *
+     * The method uses a PreparedStatement for executing the DELETE query to ensure
+     * safe parameter insertion.
+     * It also handles SQLExceptions that might occur during database operations.
+     *
+     * @param con         The Connection object to connect to the database.
+     * @param pkChoice    The value of the primary key for the record to be deleted.
+     * @param pkColumn    The name of the primary key column.
+     * @param entityParam The name of the entity (table) where the deletion is to be
+     *                    performed.
+     * @param scanner     A Scanner object to capture user input.
+     *
+     *                    Note:
+     *                    - The method assumes the existence of 'displayResultsUI'
+     *                    method for displaying database records.
+     *                    - User choice is captured using the Scanner object.
+     *                    - In case the user chooses not to delete ('n'), it calls
+     *                    'SearchModify' method to return to the previous menu.
+     *
+     *                    Usage Example:
+     * 
+     *                    <pre>
+     *                    Connection con = DriverManager.getConnection(url, username, password);
+     *                    Scanner scanner = new Scanner(System.in);
+     *                    delete(con, "123", "id", "Employee", scanner);
+     *                    </pre>
+     */
     public static void delete(Connection con, String pkChoice, String pkColumn, String entityParam, Scanner scanner) {
         clearScreen();
 
@@ -501,6 +689,52 @@ public class App {
         }
     }
 
+    /**
+     * Displays query results in a formatted output for the specified columns of an
+     * entity from the database.
+     * The method can either display all records or filter based on an attribute and
+     * its corresponding parameter.
+     *
+     * Steps involved in the method:
+     * 1. Parses and prepares the column names for display. If the user selects all
+     * columns ('*'), it fetches all attributes from the database.
+     * 2. Prints column names in a formatted manner.
+     * 3. Constructs an SQL query based on the provided parameters. It supports
+     * basic comparison operators (>, <, =).
+     * 4. Executes the SQL query and delegates the responsibility of displaying
+     * results to the 'sqlQuery' method.
+     *
+     * Parameters Explanation:
+     * 
+     * @param entityParam    The name of the entity (table) in the database.
+     * @param attribute      The attribute (column) to filter the results on. Can be
+     *                       null for no filtering.
+     * @param attributeParam A String array containing the value for the filter and
+     *                       the operator (e.g., '>', '<', '=').
+     * @param columns        A String representing the columns to be displayed. '*'
+     *                       for all columns.
+     * @param con            The Connection object to connect to the database.
+     *
+     *                       Exception Handling:
+     *                       - Throws IllegalArgumentException if the operator in
+     *                       'attributeParam' is not supported (i.e., not '>', '<',
+     *                       or '=').
+     *
+     *                       Usage Example:
+     * 
+     *                       <pre>
+     *                       Connection con = DriverManager.getConnection(url, username, password);
+     *                       displayResultsUI("Employee", "Age", new String[] { "30", ">" }, "Name, Age", con);
+     *                       </pre>
+     *
+     *                       Note:
+     *                       - The method assumes the existence of 'attListFromDB'
+     *                       and 'sqlQuery' methods for fetching attribute names
+     *                       from the database and executing SQL queries
+     *                       respectively.
+     *                       - The method is designed to handle variable number of
+     *                       columns and provides formatted output.
+     */
     public static void displayResultsUI(String entityParam, String attribute, String[] attributeParam, String columns,
             Connection con) {
         String[] columnsArray = columns.split(", ");
@@ -533,6 +767,51 @@ public class App {
         sqlQuery(sql, parameters, con);
     }
 
+    /**
+     * Executes an SQL query with the specified parameters and displays the results.
+     * This method uses a {@link PreparedStatement} to set the query parameters and
+     * then executes the query.
+     * The results are fetched from the {@link ResultSet} and displayed in a
+     * formatted manner.
+     *
+     * Steps involved in the method:
+     * 1. Prepares the SQL query using a {@link PreparedStatement}.
+     * 2. Sets the parameters of the query, if any.
+     * 3. Executes the query and retrieves a {@link ResultSet}.
+     * 4. Fetches metadata from the {@link ResultSet} to determine column count.
+     * 5. Iterates over the {@link ResultSet}, fetching and displaying each row's
+     * values.
+     *
+     * Parameters Explanation:
+     * 
+     * @param sql    The SQL query string to be executed. It can include
+     *               placeholders for parameters.
+     * @param params A list of strings representing the parameters to be set in the
+     *               SQL query.
+     * @param con    The Connection object to connect to the database.
+     *
+     *               Exception Handling:
+     *               - Catches {@link SQLException} and prints the SQL error
+     *               message.
+     *
+     *               Usage Example:
+     * 
+     *               <pre>
+     *               Connection con = DriverManager.getConnection(url, username, password);
+     *               String sql = "SELECT * FROM Employee WHERE Age > ?";
+     *               ArrayList<String> params = new ArrayList<>();
+     *               params.add("30");
+     *               sqlQuery(sql, params, con);
+     *               </pre>
+     *
+     *               Note:
+     *               - The method assumes the existence of a 'formatStrings' method
+     *               for formatting the output.
+     *               - Suitable for use with both parameterized and
+     *               non-parameterized queries.
+     *               - It is important to ensure that the query and the number of
+     *               parameters in 'params' are correctly aligned.
+     */
     public static void sqlQuery(String sql, ArrayList<String> params, Connection con) {
         try {
             PreparedStatement pstmt = con.prepareStatement(sql);
@@ -561,6 +840,17 @@ public class App {
         }
     }
 
+    /**
+     * Creates a format string for printing table-like data in a consistent,
+     * columnar format.
+     * Each column is formatted to have a fixed width of 30 characters and is
+     * left-aligned.
+     *
+     * @param sizeEntity The number of columns to format.
+     * @return A format string where each column is left-aligned within a
+     *         30-character width,
+     *         followed by a newline character at the end.
+     */
     public static String formatStrings(int sizeEntity) {
         StringBuilder format = new StringBuilder();
 
@@ -571,6 +861,17 @@ public class App {
         return format.toString();
     }
 
+    /**
+     * Determines whether a given string represents a string literal or not.
+     * The method checks if the input starts and ends with a digit,
+     * or if it is equal to "true" or "false", to conclude if it's not a string
+     * literal.
+     *
+     * @param str The string to be checked.
+     * @return {@code true} if the input is considered a string literal,
+     *         {@code false} otherwise. A string is not considered a literal
+     *         if it starts and ends with digits or equals "true" or "false".
+     */
     public static boolean isString(String str) {
         boolean isStr = true;
         if (Character.isDigit(str.charAt(0)) && Character.isDigit(str.charAt(str.length() - 1))) {
@@ -581,6 +882,14 @@ public class App {
         return isStr;
     }
 
+    /**
+     * Clears the console screen. This method is specific to Windows systems.
+     * It executes the "cls" command to clear the Windows console. If the method
+     * is run on a non-Windows system or an error occurs, it will catch and
+     * display the exception.
+     *
+     * Note: This method may not work in some IDEs' integrated consoles.
+     */
     private static void clearScreen() {
         // Clear the console screen (specific to Windows)
         try {
@@ -592,6 +901,15 @@ public class App {
         }
     }
 
+    /**
+     * Checks if the provided input string is 'q'. If it is, sets a flag (shouldRun)
+     * to false.
+     * This method is typically used after each user input to determine if the user
+     * wants
+     * to exit or terminate the current operation.
+     *
+     * @param input The user input string to check for the quit command.
+     */
     public static void checkForQuit(String input) { // you need to check for quit after each user input
         // Check if the user input is 'q', and if so, set shouldRun to false
         if ("q".equals(input)) {
@@ -599,6 +917,16 @@ public class App {
         }
     }
 
+    /**
+     * Retrieves a list of all table names from the database, excluding SQLite
+     * internal tables.
+     * This method connects to the database, executes a query to fetch table names,
+     * and returns them in an ArrayList.
+     *
+     * @return An ArrayList of String, each representing a table name in the
+     *         database.
+     *         Returns an empty list if there are no tables or if an error occurs.
+     */
     public static ArrayList<String> entListFromDB() {
         ArrayList<String> tempList = new ArrayList<>();
         // Query to select all table names in the main database
@@ -620,6 +948,19 @@ public class App {
         return tempList;
     }
 
+    /**
+     * Retrieves a list of attribute names for a given table in the database.
+     * This method connects to the database and uses the SQLite PRAGMA table_info
+     * command
+     * to fetch the column names of the specified table.
+     *
+     * @param tableName The name of the table for which attribute names are to be
+     *                  retrieved.
+     * @return An ArrayList of String, each representing an attribute (column) name
+     *         of the specified table.
+     *         Returns an empty list if the table does not exist or if an error
+     *         occurs.
+     */
     public static ArrayList<String> attListFromDB(String tableName) {
         ArrayList<String> tempList = new ArrayList<>();
         String query = "PRAGMA table_info(" + tableName + ")";
