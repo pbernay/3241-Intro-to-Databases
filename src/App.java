@@ -22,7 +22,6 @@ public class App {
     private static final String password = "password";
 
     // JDBC variables for opening and managing connections
-    private static Connection con;
     private static Statement stmt;
     private static ResultSet rs;
 
@@ -188,13 +187,6 @@ public class App {
     }
 
     public static void insertRecord(ArrayList<String> columns, ArrayList<String> values, String table) {
-        // opens database connection
-        try {
-            con = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
         StringBuilder columnNames = new StringBuilder("(");
         StringBuilder placeholders = new StringBuilder("(");
         for (int i = 0; i < columns.size(); i++) {
@@ -210,7 +202,8 @@ public class App {
 
         String sql = "INSERT INTO " + table + " " + columnNames.toString() + " VALUES " + placeholders.toString();
 
-        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = DriverManager.getConnection(url, username, password);
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
             for (int i = 0; i < values.size(); i++) {
                 String value = values.get(i).trim();
 
@@ -275,61 +268,63 @@ public class App {
                 }
             }
 
-            // attributes pulled from database
-            ArrayList<String> attributesList = attListFromDB(entityParam);
-
-            System.out.println();
-            System.out.println("Available attributes to search in include:");
-            System.out.println(attributesList);
-            System.out.println(
-                    "------------------------------------------------------------------------------------------------------");
-
-            String attribute;
-            String attributeParam = null;
-            // Prompt the user for the attribute they want to search by ex. Last Name
-            while (true) {
-                System.out.println(
-                        "What attribute would you want to search for?(If you want all just type '*')(Case Sensitive)");
-                attribute = scanner.nextLine();
-                checkForQuit(attribute);
-                if (!shouldRun)
-                    break; // Exit the loop if user entered 'q'
-                if (attributesList.contains(attribute) || attribute.equals("*")) {
-                    break;
-                } else {
-                    System.out.println("Invalid attribute entered. Please try again. Remember it is Case Sensitive.");
-                }
-            }
-            if (!shouldRun)
-                break; // Exit the loop if user entered 'q'
-            String[] attributeParamArray = null;
-            if (attribute.charAt(0) != '*' && attribute.length() != 1) {
-                // Get the specific value of the attribute the user wants to search for ex. Bob
-                System.out.println("Enter " + attribute + " and operator (EX. " + attribute + ", >): ");
-                attributeParam = scanner.nextLine();
-                attributeParamArray = attributeParam.split(", ");
-                checkForQuit(attributeParam);
-                if (isString(attributeParamArray[0]) == true) {
-                    StringBuilder tBld = new StringBuilder("'");
-                    tBld.append(attributeParamArray[0] + "'");
-                    attributeParamArray[0] = tBld.toString();
-                }
-                if (!shouldRun)
-                    break; // Exit the loop if user entered 'q'
-            }
-
-            System.out.println(
-                    "Enter the column name(s) you want to select (If you want all just type '*')(comma separated):");
-            String columns = scanner.nextLine();
-
-            clearScreen();
-            System.out.println("***Showing results for: " + entityParam + "***");
-            displayResultsUI(entityParam, attribute, attributeParamArray, columns);
-            System.out.println();
-
             ArrayList<String> primaryKeyColumns = new ArrayList<>();
-            try (Statement stmt = con.createStatement();
+            try (Connection con = DriverManager.getConnection(url, username, password);
+                    Statement stmt = con.createStatement();
                     ResultSet rs = stmt.executeQuery("PRAGMA table_info(" + entityParam + ")")) {
+
+                // attributes pulled from database
+                ArrayList<String> attributesList = attListFromDB(entityParam);
+
+                System.out.println();
+                System.out.println("Available attributes to search in include:");
+                System.out.println(attributesList);
+                System.out.println(
+                        "------------------------------------------------------------------------------------------------------");
+
+                String attribute;
+                String attributeParam = null;
+                // Prompt the user for the attribute they want to search by ex. Last Name
+                while (true) {
+                    System.out.println(
+                            "What attribute would you want to search for?(If you want all just type '*')(Case Sensitive)");
+                    attribute = scanner.nextLine();
+                    checkForQuit(attribute);
+                    if (!shouldRun)
+                        break; // Exit the loop if user entered 'q'
+                    if (attributesList.contains(attribute) || attribute.equals("*")) {
+                        break;
+                    } else {
+                        System.out
+                                .println("Invalid attribute entered. Please try again. Remember it is Case Sensitive.");
+                    }
+                }
+                if (!shouldRun)
+                    break; // Exit the loop if user entered 'q'
+                String[] attributeParamArray = null;
+                if (attribute.charAt(0) != '*' && attribute.length() != 1) {
+                    // Get the specific value of the attribute the user wants to search for ex. Bob
+                    System.out.println("Enter " + attribute + " and operator (EX. " + attribute + ", >): ");
+                    attributeParam = scanner.nextLine();
+                    attributeParamArray = attributeParam.split(", ");
+                    checkForQuit(attributeParam);
+                    if (isString(attributeParamArray[0]) == true) {
+                        StringBuilder tBld = new StringBuilder("'");
+                        tBld.append(attributeParamArray[0] + "'");
+                        attributeParamArray[0] = tBld.toString();
+                    }
+                    if (!shouldRun)
+                        break; // Exit the loop if user entered 'q'
+                }
+
+                System.out.println(
+                        "Enter the column name(s) you want to select (If you want all just type '*')(comma separated):");
+                String columns = scanner.nextLine();
+
+                clearScreen();
+                System.out.println("***Showing results for: " + entityParam + "***");
+                displayResultsUI(entityParam, attribute, attributeParamArray, columns, con);
+                System.out.println();
 
                 while (rs.next()) {
                     int isPrimaryKey = rs.getInt("pk");
@@ -356,21 +351,109 @@ public class App {
             String pkChoice = choices[0];
             String action = choices[1].trim().toLowerCase();
 
-            switch (action) {
-                case "m":
-
-                    break;
-                case "d":
-                    delete(con, pkChoice, primaryKeyColumns.get(0), entityParam, scanner);
-                    break;
-                case "n":
-                    System.out.println("Returning to main menu...");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please enter 'm', 'd', or 'n'.");
+            try (Connection con = DriverManager.getConnection(url, username, password)) {
+                switch (action) {
+                    case "m":
+                        modify(con, pkChoice, primaryKeyColumns.get(0), entityParam, scanner);
+                        break;
+                    case "d":
+                        delete(con, pkChoice, primaryKeyColumns.get(0), entityParam, scanner);
+                        break;
+                    case "n":
+                        System.out.println("Returning to main menu...");
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please enter 'm', 'd', or 'n'.");
+                }
+            } catch (Exception e) {
+                // TODO: handle exception
             }
-
             break; // Exit the loop after one search iteration
+        }
+    }
+
+    public static void modify(Connection con, String pkChoice, String pkColumn, String entityParam, Scanner scanner) {
+        clearScreen();
+        try {
+            con.setAutoCommit(false);
+
+            while (shouldRun) {
+                // Display the current record before modification
+                String[] attributeParam = { pkChoice, "=" };
+                displayResultsUI(entityParam, pkColumn, attributeParam, "*", con);
+
+                System.out.println("What attribute would you like to modify?");
+                String attToEdit = scanner.nextLine().trim();
+                checkForQuit(attToEdit);
+                if (!shouldRun)
+                    break; // Exit the loop if user entered 'q'
+
+                System.out.println("Enter a new value for " + attToEdit + ":");
+                String updatedAtt = scanner.nextLine().trim();
+                checkForQuit(updatedAtt);
+                if (!shouldRun)
+                    break; // Exit the loop if user entered 'q'
+
+                // Update the database
+                String updateSQL = "UPDATE " + entityParam + " SET " + attToEdit + " = ? WHERE " + pkColumn + " = ?";
+                PreparedStatement pstmt = con.prepareStatement(updateSQL);
+
+                pstmt.setString(1, updatedAtt);
+                pstmt.setString(2, pkChoice);
+
+                // Execute the update and get count of affected rows
+                int affectedRows = pstmt.executeUpdate();
+
+                if (affectedRows > 0) {
+                    // Show the updated record
+                    clearScreen();
+                    System.out.println("Modification successful. Showing updated " + entityParam + ":");
+                    displayResultsUI(entityParam, pkColumn, attributeParam, "*", con);
+
+                    // Confirm the update
+                    System.out.println("Commit changes? (y/n):");
+                    String confirmation = scanner.nextLine().trim();
+                    checkForQuit(confirmation);
+                    if (!shouldRun)
+                        break; // Exit the loop if user entered 'q'
+                    if ("y".equalsIgnoreCase(confirmation)) {
+                        con.commit();
+                        System.out.println("Changes committed to the database.");
+                    } else {
+                        con.rollback();
+                        System.out.println("Changes rolled back. No update has been made.");
+                    }
+                } else {
+                    System.out.println("No records were updated.");
+                }
+
+                System.out.println("Would you like to make more modifcations? (y/n):");
+                String choice = scanner.nextLine().trim();
+                checkForQuit(choice);
+
+                if ("n".equalsIgnoreCase(choice)) {
+                    break;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("A database error occurred: " + e.getMessage());
+            try {
+                if (con != null) {
+                    con.rollback(); // Rollback in case of exception during the transaction
+                    con.setAutoCommit(true); // Reset to the default mode
+                }
+            } catch (SQLException e2) {
+                System.out.println("Another database error occurred while rolling back: " + e2.getMessage());
+            }
+        } finally {
+            try {
+                // Reset auto-commit mode outside of while loop to ensure it is always reset at
+                // the end
+                if (con != null)
+                    con.setAutoCommit(true);
+            } catch (SQLException e3) {
+                System.out.println("Error resetting auto-commit mode: " + e3.getMessage());
+            }
         }
     }
 
@@ -378,7 +461,7 @@ public class App {
         clearScreen();
 
         String[] attributeParam = { pkChoice, "=" };
-        displayResultsUI(entityParam, pkColumn, attributeParam, "*");
+        displayResultsUI(entityParam, pkColumn, attributeParam, "*", con);
 
         System.out.println("Are you sure you want to delete this record (y,n)?");
         String choice = scanner.nextLine();
@@ -418,7 +501,8 @@ public class App {
         }
     }
 
-    public static void displayResultsUI(String entityParam, String attribute, String[] attributeParam, String columns) {
+    public static void displayResultsUI(String entityParam, String attribute, String[] attributeParam, String columns,
+            Connection con) {
         String[] columnsArray = columns.split(", ");
         ArrayList<String> columnsList = new ArrayList<>(Arrays.asList(columnsArray));
 
@@ -446,14 +530,11 @@ public class App {
         } else {
             sql = "SELECT " + columns + " FROM " + entityParam;
         }
-        sqlQuery(sql, parameters);
+        sqlQuery(sql, parameters, con);
     }
 
-    public static void sqlQuery(String sql, ArrayList<String> params) {
+    public static void sqlQuery(String sql, ArrayList<String> params, Connection con) {
         try {
-            // opens database connection
-            con = DriverManager.getConnection(url, username, password);
-
             PreparedStatement pstmt = con.prepareStatement(sql);
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setString(i + 1, params.get(i));
@@ -523,9 +604,7 @@ public class App {
         // Query to select all table names in the main database
         String query = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'";
 
-        try {
-            // opens database connection
-            con = DriverManager.getConnection(url, username, password);
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
             stmt = con.createStatement();
 
             // executes the query to get result
@@ -536,19 +615,6 @@ public class App {
             }
         } catch (SQLException sqlE) {
             sqlE.printStackTrace();
-        } finally {
-            // Close the connections
-            try {
-                if (rs != null)
-                    rs.close();
-                if (stmt != null)
-                    stmt.close();
-                if (con != null)
-                    con.close();
-            } catch (SQLException se) {
-                // Handle the exception properly
-                se.printStackTrace();
-            }
         }
 
         return tempList;
@@ -558,9 +624,7 @@ public class App {
         ArrayList<String> tempList = new ArrayList<>();
         String query = "PRAGMA table_info(" + tableName + ")";
 
-        try {
-            // opens database connection
-            con = DriverManager.getConnection(url, username, password);
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
             stmt = con.createStatement();
 
             // executes the query and gets the result
@@ -573,20 +637,6 @@ public class App {
 
         } catch (SQLException sqlE) {
             sqlE.printStackTrace();
-        } finally {
-            // closes the connections
-            try {
-                con.close();
-            } catch (SQLException se) {
-                /* can't do anything */ }
-            try {
-                stmt.close();
-            } catch (SQLException se) {
-                /* can't do anything */ }
-            try {
-                rs.close();
-            } catch (SQLException se) {
-                /* can't do anything */ }
         }
         return tempList;
     }
