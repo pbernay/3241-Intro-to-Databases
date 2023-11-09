@@ -1,6 +1,0 @@
-"ManagerID"
-"FirstName"
-"LastName"
-"Phone#"
-"Email"
-"HoursWorked"

@@ -1,3 +1,0 @@
-"AssignmentID"
-"ManagerID"
-"WarehouseID"

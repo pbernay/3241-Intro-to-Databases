@@ -1,6 +1,0 @@
-"ReviewID"
-"UserID"
-"EquitmentSerial#"
-"DroneSerial#"
-"Rating"
-"Comment"
