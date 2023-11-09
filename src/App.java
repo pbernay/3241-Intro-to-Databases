@@ -48,7 +48,7 @@ public class App {
             System.out.println("1. Search/Modify");
             System.out.println("2. Add");
             System.out.println("3. Exit");
-            System.out.print("Pick an Option (1,2): ");
+            System.out.print("Pick an Option (1,2,3): ");
 
             String choice = scanner.nextLine(); // Capture the user's menu choice as a string
             checkForQuit(choice); // Check if the user wants to quit the application
@@ -461,10 +461,18 @@ public class App {
             if (!shouldRun)
                 break; // Exit the loop if user entered 'q'
 
-            String[] choices = tChoice.split(",");
-            String pkChoice = choices[0];
-            String action = choices[1].trim().toLowerCase();
-
+            String action = null;
+            String pkChoice = null;
+            if (tChoice.contains(",")) {
+                String[] choices = tChoice.split(",");
+                pkChoice = choices[0];
+                action = choices[1].trim().toLowerCase();
+            } else if (tChoice.equalsIgnoreCase("n")) {
+                action = "n";
+            } else {
+                System.out.println(
+                        "Please make sure you have the right format. EX: " + primaryKeyColumns.get(0) + ", m");
+            }
             try (Connection con = DriverManager.getConnection(url, username, password)) {
                 switch (action) {
                     case "m":
