@@ -327,11 +327,94 @@ public class App {
             displayResultsUI(entityParam, attribute, attributeParamArray, columns);
             System.out.println();
 
-            System.out.println("What " + entityParam + " (by " + attributesList.get(0)
+            ArrayList<String> primaryKeyColumns = new ArrayList<>();
+            try (Statement stmt = con.createStatement();
+                    ResultSet rs = stmt.executeQuery("PRAGMA table_info(" + entityParam + ")")) {
+
+                while (rs.next()) {
+                    int isPrimaryKey = rs.getInt("pk");
+                    if (isPrimaryKey == 1) {
+                        String columnName = rs.getString("name");
+                        primaryKeyColumns.add(columnName);
+                    }
+                }
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            System.out.println("What " + entityParam + " (by " + primaryKeyColumns.get(0)
                     + ") do you want to modify/delete(m/d) or type n to return to main menu (Ex. "
-                    + attributesList.get(0) + ", m):");
+                    + primaryKeyColumns.get(0) + ", m):");
+
+            String tChoice = scanner.nextLine();
+            checkForQuit(tChoice);
+            if (!shouldRun)
+                break; // Exit the loop if user entered 'q'
+
+            String[] choices = tChoice.split(",");
+            String pkChoice = choices[0];
+            String action = choices[1].trim().toLowerCase();
+
+            switch (action) {
+                case "m":
+
+                    break;
+                case "d":
+                    delete(con, pkChoice, primaryKeyColumns.get(0), entityParam, scanner);
+                    break;
+                case "n":
+                    System.out.println("Returning to main menu...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please enter 'm', 'd', or 'n'.");
+            }
 
             break; // Exit the loop after one search iteration
+        }
+    }
+
+    public static void delete(Connection con, String pkChoice, String pkColumn, String entityParam, Scanner scanner) {
+        clearScreen();
+
+        String[] attributeParam = { pkChoice, "=" };
+        displayResultsUI(entityParam, pkColumn, attributeParam, "*");
+
+        System.out.println("Are you sure you want to delete this record (y,n)?");
+        String choice = scanner.nextLine();
+        checkForQuit(choice);
+
+        if (shouldRun) {
+            switch (choice) {
+                case "y":
+                    String sql = "DELETE FROM " + entityParam + " WHERE " + pkColumn + " = ?";
+                    try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+
+                        pstmt.setString(1, pkChoice);
+
+                        int affectedRows = pstmt.executeUpdate();
+                        if (affectedRows > 0) {
+                            System.out.println("A record was deleted successfully.");
+                        } else {
+                            System.out.println("No record was found with the provided PK.");
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "n":
+                    System.out.println("Did not delete record, 'n' was selected.");
+                    System.out.println("Sending you back to the Search/Modify screen...");
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    SearchModify(scanner);
+                default:
+                    System.out.println("Invalid choice. Please enter 'y' or 'n'.");
+            }
         }
     }
 
@@ -346,18 +429,20 @@ public class App {
         System.out.format(format, columnsList.toArray());
         for (int i = 0; i < columnsList.size() * 30; i++) {
             System.out.print("-");
+            if (i == 223) {
+                break;
+            }
         }
         System.out.println();
         String sql;
         ArrayList<String> parameters = new ArrayList<>();
         if (attributeParam != null) {
-            String operator = attributeParam[1];
+            String operator = attributeParam[1].trim();
             if (!operator.equals(">") && !operator.equals("<") && !operator.equals("=")) {
                 throw new IllegalArgumentException("Operator has not been coded yet.");
             }
             parameters.add(attributeParam[0]);
             sql = "SELECT " + columns + " FROM " + entityParam + " WHERE " + attribute + " " + operator + " ?";
-            System.out.println(sql);
         } else {
             sql = "SELECT " + columns + " FROM " + entityParam;
         }
@@ -370,7 +455,6 @@ public class App {
             con = DriverManager.getConnection(url, username, password);
 
             PreparedStatement pstmt = con.prepareStatement(sql);
-            System.out.println(params.toString());
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setString(i + 1, params.get(i));
             }
