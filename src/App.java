@@ -401,7 +401,7 @@ public class App {
                 // Prompt the user for the attribute they want to search by ex. Last Name
                 while (true) {
                     System.out.println(
-                            "What attribute would you want to search for?(If you want all just type '*')(Case Sensitive)");
+                            "What type of attribute would you want to search for?(If you want all just type '*')(Case Sensitive)");
                     attribute = scanner.nextLine();
                     checkForQuit(attribute);
                     if (!shouldRun)
@@ -417,18 +417,28 @@ public class App {
                     break; // Exit the loop if user entered 'q'
                 String[] attributeParamArray = null;
                 if (attribute.charAt(0) != '*' && attribute.length() != 1) {
-                    // Get the specific value of the attribute the user wants to search for ex. Bob
-                    System.out.println("Enter " + attribute + " and operator (EX. " + attribute + ", >): ");
-                    attributeParam = scanner.nextLine();
-                    attributeParamArray = attributeParam.split(", ");
-                    checkForQuit(attributeParam);
-                    if (isString(attributeParamArray[0]) == true) {
-                        StringBuilder tBld = new StringBuilder("'");
-                        tBld.append(attributeParamArray[0] + "'");
-                        attributeParamArray[0] = tBld.toString();
+                    boolean validInput = false;
+                    while (!validInput) {
+                        System.out.println("Enter " + attribute + " and operator EX. Enter a " + attribute + ", >): ");
+                        attributeParam = scanner.nextLine();
+                        attributeParamArray = attributeParam.split(", ");
+
+                        // Check if the user wants to quit
+                        checkForQuit(attributeParam);
+                        if (!shouldRun) {
+                            break; // Exit the loop if user entered 'q'
+                        }
+
+                        // Validate the input: check if the array has 2 elements and the second element is an operator
+                        if (attributeParamArray.length == 2 && 
+                            (attributeParamArray[1].trim().equals(">") || 
+                             attributeParamArray[1].trim().equals("<") || 
+                             attributeParamArray[1].trim().equals("="))) {
+                            validInput = true;
+                        } else {
+                            System.out.println("Invalid input. Please ensure you enter a value followed by a comma and an operator (>, <, or =).");
+                        }
                     }
-                    if (!shouldRun)
-                        break; // Exit the loop if user entered 'q'
                 }
 
                 System.out.println(
@@ -777,7 +787,8 @@ public class App {
                 throw new IllegalArgumentException("Operator has not been coded yet.");
             }
             parameters.add(attributeParam[0]);
-            sql = "SELECT " + columns + " FROM " + entityParam + " WHERE " + attribute + " " + operator + " ?";
+            sql = "SELECT " + columns + " FROM " + entityParam + " WHERE " + attribute + " " + operator + " ?;";
+            System.out.println(sql);
         } else {
             sql = "SELECT " + columns + " FROM " + entityParam;
         }
