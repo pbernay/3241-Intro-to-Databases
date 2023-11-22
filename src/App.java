@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -47,8 +48,9 @@ public class App {
             System.out.println("------------------");
             System.out.println("1. Search/Modify");
             System.out.println("2. Add");
-            System.out.println("3. Exit");
-            System.out.print("Pick an Option (1,2,3): ");
+            System.out.println("3. Advanced Search");
+            System.out.println("4. Exit");
+            System.out.print("Pick an Option (1,2,3,4): ");
 
             String choice = scanner.nextLine(); // Capture the user's menu choice as a string
             checkForQuit(choice); // Check if the user wants to quit the application
@@ -73,7 +75,10 @@ public class App {
                 case 2: // Add something
                     add(scanner);
                     break;
-                case 3: // Exit
+                case 3: // Advanced Search
+                    advancedSearch(scanner);
+                    break;
+                case 4: // Exit
                     // Close the scanner and terminate the program
                     System.out.println("Exiting...");
                     scanner.close();
@@ -97,26 +102,23 @@ public class App {
     }
 
     /**
-     * Adds a new record to a specified entity in the database.
-     * This method guides the user through the process of adding a new record by:
-     * - Displaying a list of available entities to which a record can be added.
-     * - Allowing the user to select an entity.
-     * - Prompting for input for each attribute of the chosen entity.
-     * - Asking for confirmation before adding the record.
+     * Adds a new record to a specified entity in the database. This method guides
+     * the user through the process of adding a new record by: - Displaying a list
+     * of available entities to which a record can be added. - Allowing the user to
+     * select an entity. - Prompting for input for each attribute of the chosen
+     * entity. - Asking for confirmation before adding the record.
      * 
-     * The process involves:
-     * - Displaying available entities retrieved from the database.
-     * - Validating user input against available entities.
-     * - Collecting attribute values for the new record.
-     * - Inserting the record into the database after confirmation.
+     * The process involves: - Displaying available entities retrieved from the
+     * database. - Validating user input against available entities. - Collecting
+     * attribute values for the new record. - Inserting the record into the database
+     * after confirmation.
      *
      * The method uses a Scanner object for user input and handles various user
-     * input scenarios,
-     * including validation checks and options to quit at different stages.
+     * input scenarios, including validation checks and options to quit at different
+     * stages.
      * 
      * @param scanner The Scanner object used for obtaining user input from the
-     *                console.
-     *                It should be initialized before calling this method.
+     *                console. It should be initialized before calling this method.
      * 
      *                Usage Example:
      * 
@@ -165,9 +167,8 @@ public class App {
             System.out.println(attributesList.toString());
             System.out.println(
                     "------------------------------------------------------------------------------------------------------");
-            System.out.println(
-                    "Enter each attribute (in the order above) with commas between (Ex. " + attributesList.get(0)
-                            + ", " + attributesList.get(1) + ", ...):");
+            System.out.println("Enter each attribute (in the order above) with commas between (Ex. "
+                    + attributesList.get(0) + ", " + attributesList.get(1) + ", ...):");
 
             String recordString = scanner.nextLine();
             checkForQuit(recordString);
@@ -224,19 +225,16 @@ public class App {
     }
 
     /**
-     * Inserts a new record into a specified table in the database.
-     * This method constructs a SQL insert statement dynamically based on the
-     * provided column names and values.
-     * It handles different data types (such as integers, doubles, booleans, and
-     * strings) when preparing the statement.
-     * The method also manages the database connection and execution of the prepared
-     * statement.
+     * Inserts a new record into a specified table in the database. This method
+     * constructs a SQL insert statement dynamically based on the provided column
+     * names and values. It handles different data types (such as integers, doubles,
+     * booleans, and strings) when preparing the statement. The method also manages
+     * the database connection and execution of the prepared statement.
      *
-     * The process involves:
-     * - Building a SQL insert statement using provided column names and
-     * placeholders for values.
-     * - Setting the values in the prepared statement with appropriate data types.
-     * - Executing the insert statement and reporting the outcome.
+     * The process involves: - Building a SQL insert statement using provided column
+     * names and placeholders for values. - Setting the values in the prepared
+     * statement with appropriate data types. - Executing the insert statement and
+     * reporting the outcome.
      *
      * This method assumes that the database connection details (url, username,
      * password) are available to it.
@@ -244,18 +242,16 @@ public class App {
      * @param columns An ArrayList of Strings representing the column names for the
      *                insert statement.
      * @param values  An ArrayList of Strings representing the values to be
-     *                inserted, corresponding to the columns.
-     *                Values should be in the same order as the columns. The method
-     *                attempts to parse
+     *                inserted, corresponding to the columns. Values should be in
+     *                the same order as the columns. The method attempts to parse
      *                different data types based on the content of each value.
      * @param table   The name of the table into which the record should be
      *                inserted.
      * 
-     *                Note:
-     *                - This method does not return the status of the insertion
-     *                operation but prints the outcome to the console.
-     *                - It is important that the order of columns matches the order
-     *                of values provided.
+     *                Note: - This method does not return the status of the
+     *                insertion operation but prints the outcome to the console. -
+     *                It is important that the order of columns matches the order of
+     *                values provided.
      * 
      *                Usage Example:
      * 
@@ -316,33 +312,28 @@ public class App {
     }
 
     /**
-     * Handles the Search and Modify operations for entities in a database.
-     * The method allows users to select an entity and an attribute to search within
-     * that entity.
-     * It then displays search results and provides options to modify or delete the
-     * retrieved records.
+     * Handles the Search and Modify operations for entities in a database. The
+     * method allows users to select an entity and an attribute to search within
+     * that entity. It then displays search results and provides options to modify
+     * or delete the retrieved records.
      *
-     * Steps involved in the method:
-     * 1. User selects an entity from the available options.
-     * 2. User specifies an attribute and its value for the search criteria.
-     * 3. The method retrieves and displays matching records.
-     * 4. The user is then given the option to modify or delete a record based on
-     * its primary key.
+     * Steps involved in the method: 1. User selects an entity from the available
+     * options. 2. User specifies an attribute and its value for the search
+     * criteria. 3. The method retrieves and displays matching records. 4. The user
+     * is then given the option to modify or delete a record based on its primary
+     * key.
      *
-     * The process includes:
-     * - Connecting to the database.
-     * - Dynamically generating SQL queries based on user input.
-     * - Handling SQL exceptions and ensuring proper closing of resources.
+     * The process includes: - Connecting to the database. - Dynamically generating
+     * SQL queries based on user input. - Handling SQL exceptions and ensuring
+     * proper closing of resources.
      *
      * @param scanner A Scanner object to capture user input.
      *
-     *                Note:
-     *                - The method assumes that database connection details (url,
-     *                username, password) are accessible.
-     *                - This method utilizes other helper methods for specific tasks
-     *                (like 'modify', 'delete', etc.).
-     *                - The user interface is primarily text-based, using the
-     *                console for both input and output.
+     *                Note: - The method assumes that database connection details
+     *                (url, username, password) are accessible. - This method
+     *                utilizes other helper methods for specific tasks (like
+     *                'modify', 'delete', etc.). - The user interface is primarily
+     *                text-based, using the console for both input and output.
      *
      *                Usage Example:
      * 
@@ -429,14 +420,15 @@ public class App {
                             break; // Exit the loop if user entered 'q'
                         }
 
-                        // Validate the input: check if the array has 2 elements and the second element is an operator
-                        if (attributeParamArray.length == 2 && 
-                            (attributeParamArray[1].trim().equals(">") || 
-                             attributeParamArray[1].trim().equals("<") || 
-                             attributeParamArray[1].trim().equals("="))) {
+                        // Validate the input: check if the array has 2 elements and the second element
+                        // is an operator
+                        if (attributeParamArray.length == 2 && (attributeParamArray[1].trim().equals(">")
+                                || attributeParamArray[1].trim().equals("<")
+                                || attributeParamArray[1].trim().equals("="))) {
                             validInput = true;
                         } else {
-                            System.out.println("Invalid input. Please ensure you enter a value followed by a comma and an operator (>, <, or =).");
+                            System.out.println(
+                                    "Invalid input. Please ensure you enter a value followed by a comma and an operator (>, <, or =).");
                         }
                     }
                 }
@@ -446,7 +438,6 @@ public class App {
                 String columns = scanner.nextLine();
 
                 clearScreen();
-                System.out.println("***Showing results for: " + entityParam + "***");
                 displayResultsUI(entityParam, attribute, attributeParamArray, columns, con);
                 System.out.println();
 
@@ -458,7 +449,6 @@ public class App {
                     }
                 }
             } catch (SQLException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
@@ -480,8 +470,8 @@ public class App {
             } else if (tChoice.equalsIgnoreCase("n")) {
                 action = "n";
             } else {
-                System.out.println(
-                        "Please make sure you have the right format. EX: " + primaryKeyColumns.get(0) + ", m");
+                System.out
+                        .println("Please make sure you have the right format. EX: " + primaryKeyColumns.get(0) + ", m");
             }
             try (Connection con = DriverManager.getConnection(url, username, password)) {
                 switch (action) {
@@ -497,30 +487,168 @@ public class App {
                     default:
                         System.out.println("Invalid choice. Please enter 'm', 'd', or 'n'.");
                 }
-            } catch (Exception e) {
-                // TODO: handle exception
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
             break; // Exit the loop after one search iteration
         }
     }
 
     /**
-     * Modifies a record in the database for a specified entity and primary key.
-     * The method allows the user to choose an attribute of the entity to modify and
+     * Executes an advanced search operation using a provided Scanner.
+     * This method allows the user to perform database searches on specific entities
+     * and their attributes.
+     * It repeatedly prompts the user to select an entity from a list (retrieved
+     * from the database),
+     * and then to specify an attribute of that entity to search by. The user can
+     * also specify search conditions
+     * for the selected attributes. The search continues until the user enters 'q'
+     * to quit.
+     * 
+     * The method handles invalid input by prompting the user to try again and
+     * provides detailed instructions
+     * for entering search parameters. The results of the search are displayed
+     * through the `displayResultsUI` method.
+     * 
+     * @param scn The Scanner object used for reading user input.
+     * @throws SQLException If there is an error in database connectivity or query
+     *                      execution.
+     */
+    public static void advancedSearch(Scanner scn) {
+        // Loop to keep the Advanced Search functionality until user enters 'q'
+        while (shouldRun) {
+            clearScreen();
+
+            // Display options related to Advanced Search
+            System.out.println("Advanced Search selected.");
+            System.out.println("Available entities to search in include:");
+
+            ArrayList<String> listEntities = entListFromDB();
+            System.out.println(listEntities); // entities pulled from Database
+
+            System.out.println(
+                    "------------------------------------------------------------------------------------------------------");
+
+            String entityParam;
+            while (true) {
+                // Prompt the user to specify which entity they want to search within ex. Member
+                System.out.println("What entity do you want to select to search in?(Case Sensitive)");
+                entityParam = scn.nextLine();
+                checkForQuit(entityParam);
+                if (!shouldRun)
+                    return;
+
+                if (listEntities.contains(entityParam)) {
+                    break;
+                } else {
+                    System.out.println("Invalid entity entered. Please try again.");
+                }
+            }
+
+            ArrayList<String> primaryKeyColumns = new ArrayList<>();
+            try (Connection con = DriverManager.getConnection(url, username, password);
+                    Statement stmt = con.createStatement();
+                    ResultSet rs = stmt.executeQuery("PRAGMA table_info(" + entityParam + ")")) {
+
+                // attributes pulled from database
+                ArrayList<String> attributesList = attListFromDB(entityParam);
+
+                System.out.println();
+                System.out.println("Available attributes to search in include:");
+                System.out.println(attributesList);
+                System.out.println(
+                        "------------------------------------------------------------------------------------------------------");
+
+                String attribute;
+                String attributeParam = null;
+                // Prompt the user for the attribute they want to search by ex. Last Name
+                while (true) {
+                    System.out.println(
+                            "What type of attribute(s) would you want to search for?(If you want all just type '*', to select multiple seperate with a comma)(Case Sensitive)");
+                    attribute = scn.nextLine();
+                    checkForQuit(attribute);
+                    if (!shouldRun)
+                        break; // Exit the loop if user entered 'q'
+
+                    attribute.trim();
+                    String[] attributeArray = attribute.split(",");
+                    for (int i = 0; i < attributeArray.length;)
+                        if (attributesList.contains(attributeArray[i]) || attribute.equals("*")) {
+                            break;
+                        } else {
+                            System.out.println(
+                                    "Invalid attribute entered. Please try again. Remember it is Case Sensitive.");
+                        }
+                    if (!shouldRun)
+                        break; // Exit the loop if user entered 'q'
+
+                    String[] attributeParamArray = null;
+
+                    if (attribute.charAt(0) != '*' && attribute.length() != 1) {
+                        boolean validInput = false;
+                        while (!validInput) {
+                            if (attributeArray.length == 1) {
+                                System.out.println(
+                                        "Enter " + attribute + " and operator EX. Enter a " + attribute + ", >): ");
+                            } else {
+                                System.out.println(
+                                        "Enter all your attributes like this(attribute0, operator0, attribute1, operator1) EX. "
+                                                + attributeArray[0] + ", =, " + attributeArray[1] + ", >");
+                            }
+                            attributeParam = scn.nextLine();
+                            attributeParamArray = attributeParam.split(", ");
+
+                            // Check if the user wants to quit
+                            checkForQuit(attributeParam);
+                            if (!shouldRun) {
+                                break; // Exit the loop if user entered 'q'
+                            }
+
+                            // Validate the input: check if the array has 2 elements and the second element
+                            // is an operator
+                            for (int i = 1; i < attributeParamArray.length; i += 2) {
+                                if (attributeParamArray.length % 2 == 0 && (attributeParamArray[i].trim().equals(">")
+                                        || attributeParamArray[i].trim().equals("<")
+                                        || attributeParamArray[i].trim().equals("="))) {
+                                    validInput = true;
+                                } else {
+                                    System.out.println("Invalid input at index " + i
+                                            + ". Please ensure you enter a value followed by a comma and an operator (>, <, or =).");
+                                }
+                            }
+                        }
+                    }
+                    System.out.println(
+                            "Enter the column name(s) you want to select (If you want all just type '*')(comma separated) EX. ID, Count(*) AS TheCount:");
+                    String columns = scn.nextLine();
+
+                    clearScreen();
+                    displayResultsUI(entityParam, attribute, attributeParamArray, columns, con);
+                    System.out.println();
+                    break;
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Modifies a record in the database for a specified entity and primary key. The
+     * method allows the user to choose an attribute of the entity to modify and
      * input a new value for it.
      *
-     * Steps involved in the method:
-     * 1. Displays the current record based on the primary key provided.
-     * 2. Prompts the user to choose which attribute to modify.
-     * 3. Accepts a new value for the chosen attribute.
-     * 4. Updates the database with the new value.
-     * 5. Shows the updated record and asks the user to confirm (commit or rollback)
-     * the changes.
+     * Steps involved in the method: 1. Displays the current record based on the
+     * primary key provided. 2. Prompts the user to choose which attribute to
+     * modify. 3. Accepts a new value for the chosen attribute. 4. Updates the
+     * database with the new value. 5. Shows the updated record and asks the user to
+     * confirm (commit or rollback) the changes.
      *
      * The method ensures transactional integrity by using SQL transactions. In case
-     * of an error, it rolls back any changes made during the transaction.
-     * The user can continue modifying other attributes or exit the loop based on
-     * their input.
+     * of an error, it rolls back any changes made during the transaction. The user
+     * can continue modifying other attributes or exit the loop based on their
+     * input.
      *
      * @param con         The Connection object to connect to the database.
      * @param pkChoice    The primary key value of the record to be modified.
@@ -529,13 +657,11 @@ public class App {
      *                    record is located.
      * @param scanner     A Scanner object to capture user input.
      *
-     *                    Note:
-     *                    - It is assumed that the method 'displayResultsUI' is used
-     *                    for displaying the records.
-     *                    - The user input is taken using the provided Scanner
-     *                    object.
-     *                    - The method handles SQL exceptions and ensures the
-     *                    database state is consistent in case of an error.
+     *                    Note: - It is assumed that the method 'displayResultsUI'
+     *                    is used for displaying the records. - The user input is
+     *                    taken using the provided Scanner object. - The method
+     *                    handles SQL exceptions and ensures the database state is
+     *                    consistent in case of an error.
      *
      *                    Usage Example:
      * 
@@ -631,24 +757,21 @@ public class App {
     }
 
     /**
-     * Deletes a record from the database based on the provided primary key.
-     * The method first displays the record that is to be deleted and then prompts
-     * the user for confirmation.
+     * Deletes a record from the database based on the provided primary key. The
+     * method first displays the record that is to be deleted and then prompts the
+     * user for confirmation.
      *
-     * Steps involved in the method:
-     * 1. Display the current record that matches the provided primary key.
-     * 2. Ask the user for confirmation to delete the record ('y' for yes, 'n' for
-     * no).
-     * 3. If confirmed, execute the DELETE statement to remove the record from the
-     * database.
-     * 4. If deletion is successful, a confirmation message is shown; otherwise, a
-     * message is displayed if no record was found.
-     * 5. In case of no confirmation ('n'), the user is redirected back to the
-     * Search/Modify screen.
+     * Steps involved in the method: 1. Display the current record that matches the
+     * provided primary key. 2. Ask the user for confirmation to delete the record
+     * ('y' for yes, 'n' for no). 3. If confirmed, execute the DELETE statement to
+     * remove the record from the database. 4. If deletion is successful, a
+     * confirmation message is shown; otherwise, a message is displayed if no record
+     * was found. 5. In case of no confirmation ('n'), the user is redirected back
+     * to the Search/Modify screen.
      *
      * The method uses a PreparedStatement for executing the DELETE query to ensure
-     * safe parameter insertion.
-     * It also handles SQLExceptions that might occur during database operations.
+     * safe parameter insertion. It also handles SQLExceptions that might occur
+     * during database operations.
      *
      * @param con         The Connection object to connect to the database.
      * @param pkChoice    The value of the primary key for the record to be deleted.
@@ -657,11 +780,10 @@ public class App {
      *                    performed.
      * @param scanner     A Scanner object to capture user input.
      *
-     *                    Note:
-     *                    - The method assumes the existence of 'displayResultsUI'
-     *                    method for displaying database records.
-     *                    - User choice is captured using the Scanner object.
-     *                    - In case the user chooses not to delete ('n'), it calls
+     *                    Note: - The method assumes the existence of
+     *                    'displayResultsUI' method for displaying database records.
+     *                    - User choice is captured using the Scanner object. - In
+     *                    case the user chooses not to delete ('n'), it calls
      *                    'SearchModify' method to return to the previous menu.
      *
      *                    Usage Example:
@@ -718,18 +840,15 @@ public class App {
 
     /**
      * Displays query results in a formatted output for the specified columns of an
-     * entity from the database.
-     * The method can either display all records or filter based on an attribute and
-     * its corresponding parameter.
+     * entity from the database. The method can either display all records or filter
+     * based on an attribute and its corresponding parameter.
      *
-     * Steps involved in the method:
-     * 1. Parses and prepares the column names for display. If the user selects all
-     * columns ('*'), it fetches all attributes from the database.
-     * 2. Prints column names in a formatted manner.
-     * 3. Constructs an SQL query based on the provided parameters. It supports
-     * basic comparison operators (>, <, =).
-     * 4. Executes the SQL query and delegates the responsibility of displaying
-     * results to the 'sqlQuery' method.
+     * Steps involved in the method: 1. Parses and prepares the column names for
+     * display. If the user selects all columns ('*'), it fetches all attributes
+     * from the database. 2. Prints column names in a formatted manner. 3.
+     * Constructs an SQL query based on the provided parameters. It supports basic
+     * comparison operators (>, <, =). 4. Executes the SQL query and delegates the
+     * responsibility of displaying results to the 'sqlQuery' method.
      *
      * Parameters Explanation:
      * 
@@ -742,10 +861,9 @@ public class App {
      *                       for all columns.
      * @param con            The Connection object to connect to the database.
      *
-     *                       Exception Handling:
-     *                       - Throws IllegalArgumentException if the operator in
-     *                       'attributeParam' is not supported (i.e., not '>', '<',
-     *                       or '=').
+     *                       Exception Handling: - Throws IllegalArgumentException
+     *                       if the operator in 'attributeParam' is not supported
+     *                       (i.e., not '>', '<', or '=').
      *
      *                       Usage Example:
      * 
@@ -754,19 +872,104 @@ public class App {
      *                       displayResultsUI("Employee", "Age", new String[] { "30", ">" }, "Name, Age", con);
      *                       </pre>
      *
-     *                       Note:
-     *                       - The method assumes the existence of 'attListFromDB'
-     *                       and 'sqlQuery' methods for fetching attribute names
-     *                       from the database and executing SQL queries
-     *                       respectively.
-     *                       - The method is designed to handle variable number of
-     *                       columns and provides formatted output.
+     *                       Note: - The method assumes the existence of
+     *                       'attListFromDB' and 'sqlQuery' methods for fetching
+     *                       attribute names from the database and executing SQL
+     *                       queries respectively. - The method is designed to
+     *                       handle variable number of columns and provides
+     *                       formatted output.
      */
     public static void displayResultsUI(String entityParam, String attribute, String[] attributeParam, String columns,
             Connection con) {
         String[] columnsArray = columns.split(", ");
         ArrayList<String> columnsList = new ArrayList<>(Arrays.asList(columnsArray));
+        attribute.trim();
+        String[] attributesArray = attribute.split(",");
 
+        String sql;
+        ArrayList<String> parameters = new ArrayList<>();
+        if (attributeParam != null) {
+            HashMap<String, String> attributesOperators = new HashMap<String, String>();
+            for (int i = 1; i < attributeParam.length; i += 2) {
+                attributesOperators.put(attributeParam[i - 1], attributeParam[i]);
+            }
+            for (int i = 0; i < attributeParam.length; i += 2) {
+                if (!attributesOperators.get(attributeParam[i]).equals(">")
+                        && !attributesOperators.get(attributeParam[i]).equals("<")
+                        && !attributesOperators.get(attributeParam[i]).equals("=")) {
+                    throw new IllegalArgumentException("Operator has not been coded yet.");
+                }
+                parameters.add(attributeParam[i]);
+            }
+            sql = "SELECT " + columns + " FROM " + entityParam + " WHERE " + attributesArray[0] + " "
+                    + attributesOperators.get(attributeParam[0]) + " ?";
+
+            int temp = 1;
+            for (int i = 2; i < attributeParam.length; i += 2) {
+                sql = sql + " AND " + attributesArray[temp] + attributesOperators.get(attributeParam[i]) + " ?";
+                temp++;
+            }
+        } else {
+            sql = "SELECT " + columns + " FROM " + entityParam;
+        }
+        Scanner scn = new Scanner(System.in);
+        System.out.println(
+                "Do you want to GROUP BY(1), ORDER BY(2), or LIMIT(3)?(Please select if you want anything or if none are wanted type 'x' EX. 1, 3)");
+
+        while (shouldRun) {
+            String choice = scn.nextLine();
+            checkForQuit(choice);
+            if (!shouldRun)
+                break; // Exit the loop if user entered 'q'
+
+            choice.trim();
+            String[] choices = choice.split(",");
+            for (int i = 0; i < choices.length; i++) {
+                if (choices[i].equals("1")) { // group by
+                    System.out.println("Group By selected! What attribute do you want to group by?");
+                    String groupByAtt = scn.nextLine();
+                    checkForQuit(groupByAtt);
+                    if (!shouldRun)
+                        break; // Exit the loop if user entered 'q'
+
+                    sql = sql + " GROUP BY " + groupByAtt;
+                } else if (choices[i].equals("2")) { // order by
+                    System.out.println("Order By selected! What do you want to order by?");
+                    String orderByAtt = scn.nextLine();
+                    checkForQuit(orderByAtt);
+                    if (!shouldRun)
+                        break; // Exit the loop if user entered 'q'
+                    System.out.println("ASC or DESC");
+                    String ASCDESC = scn.nextLine();
+                    checkForQuit(ASCDESC);
+                    if (!shouldRun)
+                        break; // Exit the loop if user entered 'q'
+
+                    sql = sql + " ORDER BY " + orderByAtt + " " + ASCDESC;
+                } else if (choices[i].equals("3")) { // Limit
+                    System.out.println("Limit Selected! How many are you limiting to?");
+                    String limit = scn.nextLine();
+                    checkForQuit(limit);
+                    if (!shouldRun)
+                        break; // Exit the loop if user entered 'q'
+                    Integer.parseInt(limit);
+
+                    sql = sql + " LIMIT " + limit;
+                } else if (choices[i].equals("x")) { // none
+                    break;
+                } else {
+                    System.out.println("Invalid input try again");
+                    break;
+                }
+            }
+            if (!shouldRun)
+                break; // Exit the loop if user entered 'q'
+            break;
+        }
+
+        sql = sql + ";";
+
+        System.out.println("***Showing results for: " + entityParam + "***");
         if (columnsList.get(0).equals("*")) {
             columnsList = attListFromDB(entityParam);
         }
@@ -779,36 +982,20 @@ public class App {
             }
         }
         System.out.println();
-        String sql;
-        ArrayList<String> parameters = new ArrayList<>();
-        if (attributeParam != null) {
-            String operator = attributeParam[1].trim();
-            if (!operator.equals(">") && !operator.equals("<") && !operator.equals("=")) {
-                throw new IllegalArgumentException("Operator has not been coded yet.");
-            }
-            parameters.add(attributeParam[0]);
-            sql = "SELECT " + columns + " FROM " + entityParam + " WHERE " + attribute + " " + operator + " ?;";
-            System.out.println(sql);
-        } else {
-            sql = "SELECT " + columns + " FROM " + entityParam;
-        }
         sqlQuery(sql, parameters, con);
     }
 
     /**
      * Executes an SQL query with the specified parameters and displays the results.
      * This method uses a {@link PreparedStatement} to set the query parameters and
-     * then executes the query.
-     * The results are fetched from the {@link ResultSet} and displayed in a
-     * formatted manner.
+     * then executes the query. The results are fetched from the {@link ResultSet}
+     * and displayed in a formatted manner.
      *
-     * Steps involved in the method:
-     * 1. Prepares the SQL query using a {@link PreparedStatement}.
-     * 2. Sets the parameters of the query, if any.
-     * 3. Executes the query and retrieves a {@link ResultSet}.
-     * 4. Fetches metadata from the {@link ResultSet} to determine column count.
-     * 5. Iterates over the {@link ResultSet}, fetching and displaying each row's
-     * values.
+     * Steps involved in the method: 1. Prepares the SQL query using a
+     * {@link PreparedStatement}. 2. Sets the parameters of the query, if any. 3.
+     * Executes the query and retrieves a {@link ResultSet}. 4. Fetches metadata
+     * from the {@link ResultSet} to determine column count. 5. Iterates over the
+     * {@link ResultSet}, fetching and displaying each row's values.
      *
      * Parameters Explanation:
      * 
@@ -818,9 +1005,8 @@ public class App {
      *               SQL query.
      * @param con    The Connection object to connect to the database.
      *
-     *               Exception Handling:
-     *               - Catches {@link SQLException} and prints the SQL error
-     *               message.
+     *               Exception Handling: - Catches {@link SQLException} and prints
+     *               the SQL error message.
      *
      *               Usage Example:
      * 
@@ -832,13 +1018,11 @@ public class App {
      *               sqlQuery(sql, params, con);
      *               </pre>
      *
-     *               Note:
-     *               - The method assumes the existence of a 'formatStrings' method
-     *               for formatting the output.
-     *               - Suitable for use with both parameterized and
-     *               non-parameterized queries.
-     *               - It is important to ensure that the query and the number of
-     *               parameters in 'params' are correctly aligned.
+     *               Note: - The method assumes the existence of a 'formatStrings'
+     *               method for formatting the output. - Suitable for use with both
+     *               parameterized and non-parameterized queries. - It is important
+     *               to ensure that the query and the number of parameters in
+     *               'params' are correctly aligned.
      */
     public static void sqlQuery(String sql, ArrayList<String> params, Connection con) {
         try {
@@ -870,14 +1054,12 @@ public class App {
 
     /**
      * Creates a format string for printing table-like data in a consistent,
-     * columnar format.
-     * Each column is formatted to have a fixed width of 30 characters and is
-     * left-aligned.
+     * columnar format. Each column is formatted to have a fixed width of 30
+     * characters and is left-aligned.
      *
      * @param sizeEntity The number of columns to format.
      * @return A format string where each column is left-aligned within a
-     *         30-character width,
-     *         followed by a newline character at the end.
+     *         30-character width, followed by a newline character at the end.
      */
     public static String formatStrings(int sizeEntity) {
         StringBuilder format = new StringBuilder();
@@ -890,15 +1072,14 @@ public class App {
     }
 
     /**
-     * Determines whether a given string represents a string literal or not.
-     * The method checks if the input starts and ends with a digit,
-     * or if it is equal to "true" or "false", to conclude if it's not a string
-     * literal.
+     * Determines whether a given string represents a string literal or not. The
+     * method checks if the input starts and ends with a digit, or if it is equal to
+     * "true" or "false", to conclude if it's not a string literal.
      *
      * @param str The string to be checked.
      * @return {@code true} if the input is considered a string literal,
-     *         {@code false} otherwise. A string is not considered a literal
-     *         if it starts and ends with digits or equals "true" or "false".
+     *         {@code false} otherwise. A string is not considered a literal if it
+     *         starts and ends with digits or equals "true" or "false".
      */
     public static boolean isString(String str) {
         boolean isStr = true;
@@ -911,10 +1092,10 @@ public class App {
     }
 
     /**
-     * Clears the console screen. This method is specific to Windows systems.
-     * It executes the "cls" command to clear the Windows console. If the method
-     * is run on a non-Windows system or an error occurs, it will catch and
-     * display the exception.
+     * Clears the console screen. This method is specific to Windows systems. It
+     * executes the "cls" command to clear the Windows console. If the method is run
+     * on a non-Windows system or an error occurs, it will catch and display the
+     * exception.
      *
      * Note: This method may not work in some IDEs' integrated consoles.
      */
@@ -931,10 +1112,8 @@ public class App {
 
     /**
      * Checks if the provided input string is 'q'. If it is, sets a flag (shouldRun)
-     * to false.
-     * This method is typically used after each user input to determine if the user
-     * wants
-     * to exit or terminate the current operation.
+     * to false. This method is typically used after each user input to determine if
+     * the user wants to exit or terminate the current operation.
      *
      * @param input The user input string to check for the quit command.
      */
@@ -947,13 +1126,12 @@ public class App {
 
     /**
      * Retrieves a list of all table names from the database, excluding SQLite
-     * internal tables.
-     * This method connects to the database, executes a query to fetch table names,
-     * and returns them in an ArrayList.
+     * internal tables. This method connects to the database, executes a query to
+     * fetch table names, and returns them in an ArrayList.
      *
      * @return An ArrayList of String, each representing a table name in the
-     *         database.
-     *         Returns an empty list if there are no tables or if an error occurs.
+     *         database. Returns an empty list if there are no tables or if an error
+     *         occurs.
      */
     public static ArrayList<String> entListFromDB() {
         ArrayList<String> tempList = new ArrayList<>();
@@ -977,17 +1155,15 @@ public class App {
     }
 
     /**
-     * Retrieves a list of attribute names for a given table in the database.
-     * This method connects to the database and uses the SQLite PRAGMA table_info
-     * command
+     * Retrieves a list of attribute names for a given table in the database. This
+     * method connects to the database and uses the SQLite PRAGMA table_info command
      * to fetch the column names of the specified table.
      *
      * @param tableName The name of the table for which attribute names are to be
      *                  retrieved.
      * @return An ArrayList of String, each representing an attribute (column) name
-     *         of the specified table.
-     *         Returns an empty list if the table does not exist or if an error
-     *         occurs.
+     *         of the specified table. Returns an empty list if the table does not
+     *         exist or if an error occurs.
      */
     public static ArrayList<String> attListFromDB(String tableName) {
         ArrayList<String> tempList = new ArrayList<>();
